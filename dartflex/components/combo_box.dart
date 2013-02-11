@@ -28,7 +28,7 @@ class ComboBox extends ListWrapper {
     
     _setControl(new SelectElement());
     
-    _control.onChange.listen(control_changeHandler);
+    _control.onChange.listen(_control_changeHandler);
   }
   
   void _createElement(Object item, int index) {
@@ -53,7 +53,7 @@ class ComboBox extends ListWrapper {
     controlCast.selectedIndex = _selectedIndex;
   }
   
-  void control_changeHandler(Event event) {
+  void _control_changeHandler(Event event) {
     if (_control.selectedOptions.length > 0) {
       selectedIndex = _control.selectedIndex;
       selectedItem = _dataProvider[_control.selectedIndex];

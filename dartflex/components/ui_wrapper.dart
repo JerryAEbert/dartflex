@@ -6,6 +6,12 @@ abstract class IUIWrapper implements IFrameworkEventDispatcher {
   Element get control;
   Graphics get graphics;
   
+  int get x;
+  set x(int value);
+  
+  int get y;
+  set y(int value);
+  
   bool get includeInLayout;
   set includeInLayout(bool value);
   
@@ -69,12 +75,54 @@ class UIWrapper implements IUIWrapper {
       );
       
       if (_owner != null) {
-        _owner._isLayoutUpdateRequired = true;
-        
-        later > _owner._commitProperties;
+        _owner.invalidateProperties();
       }
       
-      later > _commitProperties;
+      invalidateProperties();
+    }
+  }
+  
+  //---------------------------------
+  // x
+  //---------------------------------
+  
+  int _x = 0;
+  
+  int get x => _x;
+  
+  set x(int value) {
+    if (value != _x) {
+      _x = value;
+      
+      dispatch(
+        new FrameworkEvent('xChanged') 
+      );
+      
+      _updateControl();
+      
+      invalidateProperties();
+    }
+  }
+  
+  //---------------------------------
+  // y
+  //---------------------------------
+  
+  int _y = 0;
+  
+  int get y => _y;
+  
+  set y(int value) {
+    if (value != _y) {
+      _y = value;
+      
+      dispatch(
+        new FrameworkEvent('yChanged') 
+      );
+      
+      _updateControl();
+      
+      invalidateProperties();
     }
   }
   
@@ -89,13 +137,14 @@ class UIWrapper implements IUIWrapper {
   set width(int value) {
     if (value != _width) {
       _width = value;
-      _isLayoutUpdateRequired = true;
       
       dispatch(
         new FrameworkEvent('widthChanged') 
       );
       
-      later > _commitProperties;
+      _updateControl();
+      
+      invalidateProperties();
     }
   }
   
@@ -110,13 +159,12 @@ class UIWrapper implements IUIWrapper {
   set percentWidth(double value) {
     if (value != _percentWidth) {
       _percentWidth = value;
-      _isLayoutUpdateRequired = true;
       
       dispatch(
         new FrameworkEvent('percentWidthChanged') 
       );
       
-      later > _commitProperties;
+      invalidateProperties();
     }
   }
   
@@ -131,13 +179,14 @@ class UIWrapper implements IUIWrapper {
   set height(int value) {
     if (value != _height) {
       _height = value;
-      _isLayoutUpdateRequired = true;
       
       dispatch(
         new FrameworkEvent('heightChanged')
       );
       
-      later > _commitProperties;
+      _updateControl();
+      
+      invalidateProperties();
     }
   }
   
@@ -152,13 +201,12 @@ class UIWrapper implements IUIWrapper {
   set percentHeight(double value) {
     if (value != _percentHeight) {
       _percentHeight = value;
-      _isLayoutUpdateRequired = true;
       
       dispatch(
         new FrameworkEvent('percentHeightChanged') 
       );
       
-      later > _commitProperties;
+      invalidateProperties();
     }
   }
   
@@ -173,13 +221,12 @@ class UIWrapper implements IUIWrapper {
   set paddingLeft(int value) {
     if (value != _paddingLeft) {
       _paddingLeft = value;
-      _isLayoutUpdateRequired = true;
       
       dispatch(
         new FrameworkEvent('paddingLeftChanged') 
       );
       
-      later > _commitProperties;
+      invalidateProperties();
     }
   }
   
@@ -194,13 +241,12 @@ class UIWrapper implements IUIWrapper {
   set paddingRight(int value) {
     if (value != _paddingRight) {
       _paddingRight = value;
-      _isLayoutUpdateRequired = true;
       
       dispatch(
         new FrameworkEvent('paddingRightChanged') 
       );
       
-      later > _commitProperties;
+      invalidateProperties();
     }
   }
   
@@ -215,13 +261,12 @@ class UIWrapper implements IUIWrapper {
   set paddingTop(int value) {
     if (value != _paddingTop) {
       _paddingTop = value;
-      _isLayoutUpdateRequired = true;
       
       dispatch(
         new FrameworkEvent('paddingTopChanged') 
       );
       
-      later > _commitProperties;
+      invalidateProperties();
     }
   }
   
@@ -236,13 +281,12 @@ class UIWrapper implements IUIWrapper {
   set paddingBottom(int value) {
     if (value != _paddingBottom) {
       _paddingBottom = value;
-      _isLayoutUpdateRequired = true;
       
       dispatch(
         new FrameworkEvent('paddingBottomChanged') 
       );
       
-      later > _commitProperties;
+      invalidateProperties();
     }
   }
   
@@ -253,6 +297,17 @@ class UIWrapper implements IUIWrapper {
   ILayout _layout;
   
   ILayout get layout => _layout;
+  set layout(ILayout value) {
+    if (value != _layout) {
+      _layout = value;
+      
+      dispatch(
+        new FrameworkEvent('layoutChanged') 
+      );
+      
+      invalidateProperties();
+    }
+  }
   
   //---------------------------------
   // addLaterElements
@@ -337,9 +392,11 @@ class UIWrapper implements IUIWrapper {
   //---------------------------------
   
   void invalidateProperties() {
-    _isLayoutUpdateRequired = true;
-    
-    later > _commitProperties;
+    if (!_isLayoutUpdateRequired) {
+      _isLayoutUpdateRequired = true;
+      
+      later > _commitProperties;
+    }
   }
   
   void add(UIWrapper element, {bool prepend: false}) {
@@ -417,6 +474,20 @@ class UIWrapper implements IUIWrapper {
     later > _commitProperties;
   }
   
+  void _updateControl() {
+    if (_control != null) {
+      if (_elementId == null) {
+        _control.style.left = _x.toString().concat('px');
+        _control.style.top = _y.toString().concat('px');
+        _control.style.width = _width.toString().concat('px');
+        _control.style.height = _height.toString().concat('px');
+      } else {
+        width = _control.clientWidth;
+        height = _control.clientHeight;
+      }
+    }
+  }
+  
   void _wrapDOMTarget() {
     if (_elementId != null) {
       _control = query(_elementId);
@@ -430,6 +501,8 @@ class UIWrapper implements IUIWrapper {
       _isInitialized = true;
       
       _createChildren();
+      
+      later > _commitProperties;
     }
   }
   
@@ -470,20 +543,14 @@ class UIWrapper implements IUIWrapper {
         while (i > 0) {
           element = _children[--i];
           
-          if (element.includeInLayout) {
-            element._control.style.width = _control.style.width;
-            element._control.style.height = _control.style.height;
-          } else {
+          if (!element.includeInLayout) {
             element._control.style.position = 'absolute';
           }
           
-          element._control.style.left = _control.style.left;
-          element._control.style.top = _control.style.top;
-          
-          element._width = _width;
-          element._height = _height;
-          
-          element.invalidateProperties();
+          element.x = _x;
+          element.y = _y;
+          element.width = _width;
+          element.height = _height;
         }
       }
     }

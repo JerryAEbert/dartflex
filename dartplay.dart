@@ -6,6 +6,7 @@ import 'package:dartflex/collections/collections.dart';
 import 'package:dartflex/components/components.dart';
 import 'package:dartflex/core/core.dart';
 import 'package:dartflex/events/events.dart';
+import 'package:dartflex/layout/layout.dart';
 import 'package:demo/demo.dart';
 
 void main() {
@@ -152,14 +153,13 @@ ListRenderer _listRenderer;
 RichText _innerHtmlDisplay;
 
 void initContainer02() {
-  _listRenderer = new ListRenderer()
+  _listRenderer = new ListRenderer(orientation: 'horizontal')
   //..itemRendererFactory = new ClassFactory('dartflex.components', 'ItemRenderer')
   ..itemRendererFactory = new ClassFactory(constructorMethod: DemoItemRenderer.construct)
   ..width = 400
   ..percentHeight = 100.0
-  ..colPercentWidth = 100.0
-  ..rowHeight = 30
-  ..dataProvider = createDataProvider(dpLen: 1000, labelMain: 'Employee nr.');
+  ..colWidth = 160
+  ..dataProvider = createDataProvider(dpLen: 5000, labelMain: 'Employee nr.');
   
   _innerHtmlDisplay = new RichText()
   ..percentWidth = 100.0

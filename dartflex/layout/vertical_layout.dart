@@ -1,6 +1,6 @@
 part of dartflex.layout;
 
-class HorizontalLayout implements ILayout {
+class VerticalLayout implements ILayout {
   
   //---------------------------------
   //
@@ -36,7 +36,7 @@ class HorizontalLayout implements ILayout {
   //
   //---------------------------------
   
-  Horizontalayout() {}
+  VerticalLayout() {}
   
   //---------------------------------
   //
@@ -46,8 +46,9 @@ class HorizontalLayout implements ILayout {
   
   void doLayout(int width, int height, int pageItemSize, int pageOffset, int pageSize, List<UIWrapper> elements) {
     UIWrapper element;
-    int percWidth = width;
-    int offset = 0;
+    int percHeight = height;
+    int pageHeightFloored = (pageItemSize == 0) ? 0 : (pageOffset / pageItemSize).toInt() * pageItemSize;
+    int offset = _useVirtualLayout ? pageHeightFloored : 0;
     int len = elements.length;
     int w, h, i, sx;
     int staticElmLen = 0;
@@ -58,10 +59,10 @@ class HorizontalLayout implements ILayout {
       if (!element.includeInLayout) {
         staticElmLen++;
       } else if (
-          (element.percentWidth == 0.0) &&
-          (element.width > 0)
+          (element.percentHeight == 0.0) &&
+          (element.height > 0)
       ) {
-        percWidth -= element.width;
+        percHeight -= element.height;
         
         staticElmLen++;
       }
@@ -69,20 +70,22 @@ class HorizontalLayout implements ILayout {
     
     sx = len - staticElmLen;
     
-    percWidth -= staticElmLen * _gap;
+    percHeight -= staticElmLen * _gap;
     
     for (i=0; i<len; i++) {
       element = elements[i];
       
+      element.control.style.position = 'absolute';
+      
       if (element.includeInLayout) {
         if (element.percentWidth > 0.0) {
-          w = (element.percentWidth * .01 * (percWidth - _gap * (sx - 1)) / sx).toInt();
+          w = (width * element.percentWidth * .01).toInt();
         } else if (element.width > 0) {
           w = element.width;
         }
         
-        if (element.percentHeight > 0) {
-          h = (height * element.percentHeight * .01).toInt();
+        if (element.percentHeight > 0.0) {
+          h = (element.percentHeight * .01 * (percHeight - _gap * (sx - 1)) / sx).toInt();
         } else if (element.height > 0) {
           h = element.height;
         }
@@ -90,23 +93,27 @@ class HorizontalLayout implements ILayout {
         w = (w == null) ? 0 : w;
         h = (h == null) ? 0 : h;
         
-        element.control.style.position = 'absolute';
-        element.control.style.left = offset.toString().concat('px');
-        element.control.style.top = (height * .5 - h * .5).toString().concat('px');
-        element.control.style.width = w.toString().concat('px');
-        element.control.style.height = h.toString().concat('px');
+        element.x = (width * .5 - w * .5).toInt();
+        
+        if (
+            (pageSize == 0) || 
+            ((offset + h) <= pageSize)
+        ) {
+          element.y = offset;
+        } else {
+          element.y = 0;
+        }
         
         element.width = w;
         element.height = h;
         
-        offset += w + _gap;
+        offset += h + _gap;
+      } else {
+        element.x = 0;
+        element.y = 0;
       }
-      
-      element.invalidateProperties();
     }
   }
   
 }
-
-
 

@@ -46,7 +46,7 @@ class ListWrapper extends UIWrapper {
   String _horizontalScrollPolicy = ScrollPolicy.NONE;
   
   String get horizontalScrollPolicy => _horizontalScrollPolicy;
-  set horizontalScrollPolicy(Function value) {
+  set horizontalScrollPolicy(String value) {
     if (value != _horizontalScrollPolicy) {
       _horizontalScrollPolicy = value;
       
@@ -69,7 +69,7 @@ class ListWrapper extends UIWrapper {
   String _verticalScrollPolicy = ScrollPolicy.NONE;
   
   String get verticalScrollPolicy => _verticalScrollPolicy;
-  set verticalScrollPolicy(Function value) {
+  set verticalScrollPolicy(String value) {
     if (value != _verticalScrollPolicy) {
       _verticalScrollPolicy = value;
       

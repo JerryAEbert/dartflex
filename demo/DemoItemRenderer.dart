@@ -8,10 +8,10 @@ class DemoItemRenderer extends ItemRenderer {
   //
   //---------------------------------
   
-  HGroup _container;
+  Group _container;
   RichText _label;
   ComboBox _selection01;
-  ComboBox _selection02;
+  Image _image;
   
   //---------------------------------
   //
@@ -53,7 +53,7 @@ class DemoItemRenderer extends ItemRenderer {
   }
   
   void createChildren() {
-    _container = new HGroup()
+    _container = new VGroup()
     ..percentWidth = 100.0
     ..percentHeight = 100.0;
     
@@ -66,10 +66,10 @@ class DemoItemRenderer extends ItemRenderer {
     ..height = 22
     ..dataProvider = createDataProvider(dpLen: 100, labelMain: 'cost', modifier: 10, suffix: '\$');
     
-    _selection02 = new ComboBox()
+    _image = new Image()
     ..width = 120
     ..height = 22
-    ..dataProvider = createDataProvider(dpLen: 10, labelMain: 'rating');
+    ..source = 'http://www.androidguys.com/wp-content/uploads/2012/10/nexus4_hero_image_720.jpg';
     
     if (data != null) {
       _label.text = control_labelHandler(data);
@@ -77,7 +77,7 @@ class DemoItemRenderer extends ItemRenderer {
     
     _container.add(_label);
     _container.add(_selection01);
-    _container.add(_selection02);
+    _container.add(_image);
     
     _selection01['selectedIndexChanged'] = (
       (FrameworkEvent event) {
@@ -85,14 +85,6 @@ class DemoItemRenderer extends ItemRenderer {
           data.rating01 = event.relatedObject;
         }
       }
-    );
-    
-    _selection02['selectedIndexChanged'] = (
-        (FrameworkEvent event) {
-          if (data != null) {
-            data.rating02 = event.relatedObject;
-          }
-        }
     );
     
     add(_container);
@@ -105,10 +97,6 @@ class DemoItemRenderer extends ItemRenderer {
     
     if (_selection01 != null) {
       _selection01.selectedIndex = (data != null) ? data.rating01 : -1;
-    }
-    
-    if (_selection02 != null) {
-      _selection02.selectedIndex = (data != null) ? data.rating02 : -1;
     }
   }
   

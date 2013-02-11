@@ -16,6 +16,7 @@ part "combo_box.dart";
 part "hgroup.dart";
 part "graphics.dart";
 part "group.dart";
+part "image.dart";
 part "item_renderer.dart";
 part "list_renderer.dart";
 part "list_wrapper.dart";

@@ -12,6 +12,29 @@ class ListRenderer extends ListWrapper {
   //---------------------------------
   
   //---------------------------------
+  // orientation
+  //---------------------------------
+  
+  String _orientation;
+  bool _isOrientationChanged = false;
+  
+  String get orientation => _orientation;
+  set orientation(String value) {
+    if (value != _orientation) {
+      _orientation = value;
+      _isOrientationChanged = true;
+      
+      dispatch(
+        new FrameworkEvent(
+          'orientationChanged' 
+        )    
+      );
+      
+      later > _commitProperties;
+    }
+  }
+  
+  //---------------------------------
   // itemRenderer
   //---------------------------------
   
@@ -122,15 +145,8 @@ class ListRenderer extends ListWrapper {
   //
   //---------------------------------
   
-  ListRenderer() : super(elementId: null) {
-    ILayout defaultLayout = new VerticalLayout();
-    
-    defaultLayout.useVirtualLayout = true;
-    defaultLayout.gap = 0;
-    
-    _layout = defaultLayout;
-    
-    _verticalScrollPolicy = ScrollPolicy.AUTO;
+  ListRenderer({String orientation: 'vertical'}) : super(elementId: null) {
+    this.orientation = orientation;
   }
   
   //---------------------------------
@@ -144,6 +160,37 @@ class ListRenderer extends ListWrapper {
   // Protected methods
   //
   //---------------------------------
+  
+  void _commitProperties() {
+    ILayout defaultLayout;
+    
+    super._commitProperties();
+    
+    if (_isOrientationChanged) {
+      if (orientation == 'horizontal') {
+        defaultLayout = new HorizontalLayout();
+        
+        _rowHeight = 0;
+        _rowPercentHeight = 100.0;
+        
+        horizontalScrollPolicy = ScrollPolicy.AUTO;
+        verticalScrollPolicy = ScrollPolicy.NONE;
+      } else if (orientation == 'vertical') {
+        defaultLayout = new VerticalLayout();
+        
+        _colWidth = 0;
+        _colPercentWidth = 100.0;
+        
+        horizontalScrollPolicy = ScrollPolicy.NONE;
+        verticalScrollPolicy = ScrollPolicy.AUTO;
+      }
+      
+      defaultLayout.useVirtualLayout = true;
+      defaultLayout.gap = 0;
+      
+      layout = defaultLayout;
+    }
+  }
   
   void _createChildren() {
     DivElement container = new DivElement();
@@ -188,7 +235,7 @@ class ListRenderer extends ListWrapper {
     if (_rowHeight > 0) {
       renderer.height = _rowHeight;
     } else {
-      renderer.percentHeight = _colPercentHeight;
+      renderer.percentHeight = _rowPercentHeight;
     }
     
     _itemRenderers.add(renderer);
@@ -242,16 +289,15 @@ class ListRenderer extends ListWrapper {
       return super._getPageItemSize();
     }
     
-    return _rowHeight;
-    //return (_height / _dataProvider.length).toInt();
+    return (_layout is VerticalLayout) ? _rowHeight : _colWidth;
   }
   
   int _getPageOffset() {
-    return _control.scrollTop;
+    return (_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft;
   }
   
   int _getPageSize() {
-    return (_dataProvider.length * _rowHeight);
+    return (_dataProvider.length * _getPageItemSize());
   }
   
   void _updateElements() {
@@ -266,10 +312,20 @@ class ListRenderer extends ListWrapper {
             (_rowPercentHeight > .0)
         )
     ) {
-      int elementsRequired = min(
-          ((_height / _rowHeight).toInt() + 2),
-          _dataProvider.length
-      );
+      bool isVerticalLayout = (_layout is VerticalLayout);
+      int elementsRequired;
+      
+      if (isVerticalLayout) {
+        elementsRequired = min(
+            ((_height / _rowHeight).toInt() + 2),
+            _dataProvider.length
+        );
+      } else {
+        elementsRequired = min(
+            ((_width / _colWidth).toInt() + 2),
+            _dataProvider.length
+        );
+      }
       
       Object element;
       int existingLen = (_itemRenderers != null) ? _itemRenderers.length : 0;
@@ -280,8 +336,13 @@ class ListRenderer extends ListWrapper {
         _createElement(null, -1);
       }
       
-      _scrollTarget.width = _width;
-      _scrollTarget.height = _dataProvider.length * _rowHeight;
+      if (isVerticalLayout) {
+        _scrollTarget.width = _width;
+        _scrollTarget.height = _dataProvider.length * _rowHeight;
+      } else {
+        _scrollTarget.width = _dataProvider.length * _colWidth;
+        _scrollTarget.height = _height;
+      }
       
       if (len > 0) {
         _updateVisibleItemRenderers();
@@ -291,9 +352,9 @@ class ListRenderer extends ListWrapper {
   }
   
   void _updateLayout() {
-    super._updateLayout();
-    
     _updateElements();
+    
+    later > super._updateLayout;
   }
   
   void _updateVisibleItemRenderers() {
