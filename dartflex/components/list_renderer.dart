@@ -4,6 +4,7 @@ class ListRenderer extends ListWrapper {
   
   List<IItemRenderer> _itemRenderers;
   Group _scrollTarget;
+  bool _hasOwnScroller = true;
   
   //---------------------------------
   //
@@ -30,7 +31,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      later > _commitProperties;
+      invalidateProperties();
     }
   }
   
@@ -51,7 +52,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      later > _commitProperties;
+      invalidateProperties();
     }
   }
   
@@ -72,7 +73,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      later > _commitProperties;
+      invalidateProperties();
     }
   }
   
@@ -93,7 +94,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      later > _commitProperties;
+      invalidateProperties();
     }
   }
   
@@ -114,7 +115,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      later > _commitProperties;
+      invalidateProperties();
     }
   }
   
@@ -135,7 +136,29 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      later > _commitProperties;
+      invalidateProperties();
+    }
+  }
+  
+  //---------------------------------
+  // scrollPosition
+  //---------------------------------
+  
+  int _scrollPosition = 0;
+  
+  int get scrollPosition => _scrollPosition;
+  set scrollPosition(int value) {
+    if (value != _scrollPosition) {
+      _scrollPosition = value;
+      
+      dispatch(
+        new FrameworkEvent(
+          'scrollPositionChanged' 
+        )    
+      );
+      
+      _updateVisibleItemRenderers();
+      _updateLayout();
     }
   }
   
@@ -164,8 +187,6 @@ class ListRenderer extends ListWrapper {
   void _commitProperties() {
     ILayout defaultLayout;
     
-    super._commitProperties();
-    
     if (_isOrientationChanged) {
       if (orientation == 'horizontal') {
         defaultLayout = new HorizontalLayout();
@@ -173,7 +194,7 @@ class ListRenderer extends ListWrapper {
         _rowHeight = 0;
         _rowPercentHeight = 100.0;
         
-        horizontalScrollPolicy = ScrollPolicy.AUTO;
+        horizontalScrollPolicy = _hasOwnScroller ? ScrollPolicy.AUTO : ScrollPolicy.NONE;
         verticalScrollPolicy = ScrollPolicy.NONE;
       } else if (orientation == 'vertical') {
         defaultLayout = new VerticalLayout();
@@ -182,7 +203,7 @@ class ListRenderer extends ListWrapper {
         _colPercentWidth = 100.0;
         
         horizontalScrollPolicy = ScrollPolicy.NONE;
-        verticalScrollPolicy = ScrollPolicy.AUTO;
+        verticalScrollPolicy = _hasOwnScroller ? ScrollPolicy.AUTO : ScrollPolicy.NONE;
       }
       
       defaultLayout.useVirtualLayout = true;
@@ -190,6 +211,8 @@ class ListRenderer extends ListWrapper {
       
       layout = defaultLayout;
     }
+    
+    super._commitProperties();
   }
   
   void _createChildren() {
@@ -206,7 +229,7 @@ class ListRenderer extends ListWrapper {
     container.style.border = '1px solid #808080';
     container.style.backgroundColor = '#ffffff';
     
-    container.onScroll.listen(container_scrollHandler);
+    container.onScroll.listen(_container_scrollHandler);
     
     super._createChildren();
   }
@@ -293,7 +316,7 @@ class ListRenderer extends ListWrapper {
   }
   
   int _getPageOffset() {
-    return (_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft;
+    return _hasOwnScroller ? _scrollPosition : 0;
   }
   
   int _getPageSize() {
@@ -361,7 +384,7 @@ class ListRenderer extends ListWrapper {
     Object data;
     IItemRenderer renderer;
     int dpLen = _dataProvider.length;
-    int firstIndex = (_getPageOffset() / _getPageItemSize()).toInt();
+    int firstIndex = (_scrollPosition / _getPageItemSize()).toInt();
     int len = firstIndex + _itemRenderers.length;
     int rendererIndex = 0;
     int i;
@@ -392,7 +415,7 @@ class ListRenderer extends ListWrapper {
     IItemRenderer renderer;
     Object newSelectedItem;
     Element target = event.currentTarget as Element;
-    int firstIndex = (_getPageOffset() / _getPageItemSize()).toInt();
+    int firstIndex = (_scrollPosition / _getPageItemSize()).toInt();
     int i = _itemRenderers.length;
     
     while (i > 0) {
@@ -420,9 +443,8 @@ class ListRenderer extends ListWrapper {
     selectedItem = newSelectedItem;
   }
   
-  void container_scrollHandler(Event event) {
-    _updateVisibleItemRenderers();
-    _updateLayout();
+  void _container_scrollHandler(Event event) {
+    scrollPosition = (_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft;
   }
   
   void _itemRenderer_controlChangedHandler(FrameworkEvent event) {

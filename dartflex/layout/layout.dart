@@ -14,7 +14,7 @@ abstract class ILayout {
   int get gap;
   set gap(int value);
   
-  void doLayout(int width, int height, int pageItemSize, int pageOffset, int pageSize, List<UIWrapper> elements) {}
+  void doLayout(int width, int height, int pageItemSize, int pageOffset, int pageSize, List<UIWrapper> elements);
   
 }
 

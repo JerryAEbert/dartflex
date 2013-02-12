@@ -8,8 +8,10 @@ class VGroup extends Group {
   //
   //---------------------------------
   
-  VGroup({String elementId: null}) : super(elementId: elementId) {
+  VGroup({String elementId: null, int gap: 10}) : super(elementId: elementId) {
     _layout = new VerticalLayout();
+    
+    _layout.gap = gap;
   }
   
   //---------------------------------

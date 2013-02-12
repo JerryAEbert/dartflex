@@ -400,6 +400,10 @@ class UIWrapper implements IUIWrapper {
   }
   
   void add(UIWrapper element, {bool prepend: false}) {
+    if (_children.indexOf(element) >= 0) {
+      return;
+    }
+    
     if (_control == null) {
       if (prepend) {
         List<UIWrapper> newList = new List<UIWrapper>();
@@ -471,7 +475,7 @@ class UIWrapper implements IUIWrapper {
       )
     );
     
-    later > _commitProperties;
+    invalidateProperties();
   }
   
   void _updateControl() {
@@ -502,7 +506,7 @@ class UIWrapper implements IUIWrapper {
       
       _createChildren();
       
-      later > _commitProperties;
+      invalidateProperties();
     }
   }
   

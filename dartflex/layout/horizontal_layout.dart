@@ -36,7 +36,8 @@ class HorizontalLayout implements ILayout {
   //
   //---------------------------------
   
-  Horizontalayout() {}
+  Horizontalayout() {
+  }
   
   //---------------------------------
   //

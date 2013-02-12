@@ -13,6 +13,7 @@ import 'package:dartflex/layout/layout.dart';
 part "accordion.dart";
 part "button.dart";
 part "combo_box.dart";
+part "data_grid.dart";
 part "hgroup.dart";
 part "graphics.dart";
 part "group.dart";

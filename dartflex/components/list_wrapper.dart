@@ -1,9 +1,8 @@
 part of dartflex.components;
 
-class ListWrapper extends UIWrapper {
+class ListWrapper extends Group {
   
   bool _isElementUpdateRequired = false;
-  bool _isScrollPolicyInvalid = false;
   
   //---------------------------------
   //
@@ -36,53 +35,7 @@ class ListWrapper extends UIWrapper {
       );
     }
     
-    later > _commitProperties;
-  }
-  
-  //---------------------------------
-  // horizontalScrollPolicy
-  //---------------------------------
-  
-  String _horizontalScrollPolicy = ScrollPolicy.NONE;
-  
-  String get horizontalScrollPolicy => _horizontalScrollPolicy;
-  set horizontalScrollPolicy(String value) {
-    if (value != _horizontalScrollPolicy) {
-      _horizontalScrollPolicy = value;
-      
-      _isScrollPolicyInvalid = true;
-      
-      dispatch(
-        new FrameworkEvent(
-          "horizontalScrollPolicyChanged"
-        )
-      );
-      
-      later > _commitProperties;
-    }
-  }
-  
-  //---------------------------------
-  // verticalScrollPolicy
-  //---------------------------------
-  
-  String _verticalScrollPolicy = ScrollPolicy.NONE;
-  
-  String get verticalScrollPolicy => _verticalScrollPolicy;
-  set verticalScrollPolicy(String value) {
-    if (value != _verticalScrollPolicy) {
-      _verticalScrollPolicy = value;
-      
-      _isScrollPolicyInvalid = true;
-      
-      dispatch(
-        new FrameworkEvent(
-          "verticalScrollPolicyChanged"
-        )
-      );
-      
-      later > _commitProperties;
-    }
+    invalidateProperties();
   }
   
   //---------------------------------
@@ -181,7 +134,6 @@ class ListWrapper extends UIWrapper {
     super._setControl(element);
     
     _isElementUpdateRequired = true;
-    _isScrollPolicyInvalid = true;
   }
   
   void _commitProperties() {
@@ -192,20 +144,18 @@ class ListWrapper extends UIWrapper {
         _isElementUpdateRequired = false;
         
         _updateElements();
-      }
-      
-      if (_isScrollPolicyInvalid) {
-        _isScrollPolicyInvalid = false;
-        
-        _updateScrollPolicy();
       }  
     }
   }
   
   void _removeAllElements() {
-    while (_control.children.length > 0) {
-      _control.children.removeLast();
+    if (_control != null) {
+      while (_control.children.length > 0) {
+        _control.children.removeLast();
+      }
     }
+    
+    _children = new List<UIWrapper>();
   }
   
   void _updateElements() {
@@ -230,31 +180,10 @@ class ListWrapper extends UIWrapper {
   void _createElement(Object item, int index) {
   }
   
-  void _updateScrollPolicy() {
-    // TO_FIX
-    _control.style.overflow = 'visible';
-    
-    if (_horizontalScrollPolicy == ScrollPolicy.NONE) {
-      _control.style.overflowX = 'hidden';
-    } else if (_horizontalScrollPolicy == ScrollPolicy.AUTO) {
-      _control.style.overflowX = 'auto';
-    } else {
-      _control.style.overflowX = 'scroll';
-    }
-    
-    if (_verticalScrollPolicy == ScrollPolicy.NONE) {
-      _control.style.overflowY = 'hidden';
-    } else if (_verticalScrollPolicy == ScrollPolicy.AUTO) {
-      _control.style.overflowY = 'auto';
-    } else {
-      _control.style.overflowY = 'scroll';
-    }
-  }
-  
   void _dataProvider_collectionChangedHandler(FrameworkEvent event) {
     _isElementUpdateRequired = true;
     
-    later > _commitProperties;
+    invalidateProperties();
   }
   
 }

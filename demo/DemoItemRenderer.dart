@@ -53,7 +53,7 @@ class DemoItemRenderer extends ItemRenderer {
   }
   
   void createChildren() {
-    _container = new VGroup()
+    _container = new HGroup()
     ..percentWidth = 100.0
     ..percentHeight = 100.0;
     

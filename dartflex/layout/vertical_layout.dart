@@ -36,7 +36,8 @@ class VerticalLayout implements ILayout {
   //
   //---------------------------------
   
-  VerticalLayout() {}
+  VerticalLayout() {
+  }
   
   //---------------------------------
   //

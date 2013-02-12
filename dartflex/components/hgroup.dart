@@ -8,8 +8,10 @@ class HGroup extends Group {
   //
   //---------------------------------
   
-  HGroup({String elementId: null}) : super(elementId: elementId) {
+  HGroup({String elementId: null, int gap: 10}) : super(elementId: elementId) {
     _layout = new HorizontalLayout();
+    
+    _layout.gap = gap;
   }
   
   //---------------------------------
