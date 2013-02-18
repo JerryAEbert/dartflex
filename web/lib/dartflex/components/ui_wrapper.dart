@@ -598,9 +598,10 @@ class UIWrapper implements IUIWrapper {
     
     if (_control != null) {
       if (_elementId == null) {
+        
         switch (type) {
           case 1 : _control.style.setProperty('left', '$_x$px', ''); break;
-          case 2 : _control.style.setProperty('top', '$_y$px', ''); break;
+          case 2 : _control.style.setProperty('top', '$_y$px', ''); break; //_control.style.cssText = _control.style.cssText.replaceFirst(new RegExp(' top: \\d+px;'), ' top: $_y$px;'); break;
           case 3 : _control.style.setProperty('width', '$_width$px', ''); break;
           case 4 : _control.style.setProperty('height', '$_height$px', ''); break;
           case 5 : 

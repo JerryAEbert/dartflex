@@ -76,7 +76,7 @@ class UpdateManager {
     }
   }
   
-  Future waitForTick() {  
+  Future waitForTick() {
     final completer = new Completer();  
     
     void runAfterTimeout(_) {  

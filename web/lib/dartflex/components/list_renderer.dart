@@ -284,7 +284,37 @@ class ListRenderer extends ListWrapper {
     
     container.onScroll.listen(_container_scrollHandler);
     
+    container.document.onMouseDown.listen(
+      (Event event) => _triggerIdle()
+    );
+    
     super._createChildren();
+  }
+  
+  bool _isMouseDownTriggered = false;
+  
+  void _triggerIdle() {
+    _isMouseDownTriggered = true;
+    
+    idleTimeout().then(
+        (_) {
+          _isMouseDownTriggered = false;
+          
+          _updateAfterScrollPositionChanged(true);
+        }
+    );
+  }
+  
+  Future idleTimeout() {
+    final completer = new Completer();  
+    
+    void runAfterTimeout(_) {  
+      completer.complete();  
+    }  
+    
+    new Timer(300, runAfterTimeout);  
+    
+    return completer.future;  
   }
   
   void _removeAllElements() {
@@ -537,7 +567,9 @@ class ListRenderer extends ListWrapper {
         data = null;
       }
       
-      renderer.data = ((_labelFunction != null) && (data != null)) ? _labelFunction(data) : data;
+      if (!_isMouseDownTriggered) {
+        renderer.data = ((_labelFunction != null) && (data != null)) ? _labelFunction(data) : data;
+      }
     }
   }
   
@@ -575,6 +607,10 @@ class ListRenderer extends ListWrapper {
   }
   
   void _container_scrollHandler(Event event) {
+    if (!_isMouseDownTriggered) {
+      _triggerIdle();
+    }
+    
     scrollPosition = (_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft;
     
     dispatch(

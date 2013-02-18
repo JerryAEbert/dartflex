@@ -70,7 +70,7 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
     if (value != _data) {
       _data = value;
       
-      _invalidateData();
+      later > _invalidateData;
     }
   }
   
