@@ -132,6 +132,18 @@ class ListCollection extends FrameworkEventDispatcher implements IFrameworkEvent
     return -1;
   }
   
+  void sort(Function compareFunction) {
+    if (_source != null) {
+      _source.sort(compareFunction);
+      
+      dispatch(
+          new CollectionEvent(
+              CollectionEvent.COLLECTION_CHANGED
+          )
+      );
+    }
+  }
+  
   ListCollection reverse() {
     return new ListCollection(source: _source.reversed);
   }

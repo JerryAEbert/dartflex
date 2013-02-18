@@ -82,9 +82,11 @@ class FrameworkEventDispatcher implements IFrameworkEventDispatcher {
       
       if (
           (type == valuePair.type) &&
-          (eventHandler == valuePair.eventHandler)
+          FunctionEqualityUtil.equals(eventHandler, valuePair.eventHandler)
       ) {
         _listenerValuePairs.removeAt(i);
+        
+        return;
       }
     }
   }
@@ -93,13 +95,15 @@ class FrameworkEventDispatcher implements IFrameworkEventDispatcher {
     FrameworkEventListenerValuePair valuePair;
     int i = _listenerValuePairs.length;
     
-    event.currentTarget = _dispatcher;
-    
-    while (i > 0) {
-      valuePair = _listenerValuePairs[--i];
+    if (i > 0) {
+      event.currentTarget = _dispatcher;
       
-      if (event.type == valuePair.type) {
-        valuePair.eventHandler(event);
+      while (i > 0) {
+        valuePair = _listenerValuePairs[--i];
+        
+        if (event.type == valuePair.type) {
+          valuePair.eventHandler(event);
+        }
       }
     }
   }

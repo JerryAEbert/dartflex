@@ -29,6 +29,15 @@ class HorizontalLayout implements ILayout {
   
   int get gap => _gap;
   set gap(int value) => _gap = value;
+  
+  //---------------------------------
+  // constrainToBounds
+  //---------------------------------
+  
+  bool _constrainToBounds = true;
+  
+  bool get constrainToBounds => _constrainToBounds;
+  set constrainToBounds(bool value) => _constrainToBounds = value;
 
   //---------------------------------
   //
@@ -36,7 +45,8 @@ class HorizontalLayout implements ILayout {
   //
   //---------------------------------
   
-  Horizontalayout() {
+  Horizontalayout({bool constrainToBounds: true}) {
+    _constrainToBounds = constrainToBounds;
   }
   
   //---------------------------------
@@ -76,7 +86,9 @@ class HorizontalLayout implements ILayout {
     for (i=0; i<len; i++) {
       element = elements[i];
       
-      element.control.style.position = 'absolute';
+      if (element.control.style.position != 'absolute') {
+        element.control.style.position = 'absolute';
+      }
       
       if (element.includeInLayout) {
         if (element.percentWidth > 0.0) {
@@ -98,16 +110,24 @@ class HorizontalLayout implements ILayout {
             (pageSize == 0) || 
             ((offset + w) <= pageSize)
         ) {
-          element.x = offset;
+          element.x = offset + element.paddingLeft;
         } else {
           element.x = 0;
         }
         
-        element.y = (height * .5 - h * .5).toInt();
-        element.width = w;
-        element.height = h;
+        if (_constrainToBounds) {
+          element.y = (height * .5 - h * .5).toInt();
+        }
         
-        offset += w + _gap;
+        if (element.autoSize) {
+          element.width = w;
+        }
+        
+        if (_constrainToBounds && element.autoSize) {
+          element.height = h;
+        }
+        
+        offset += w + _gap + element.paddingLeft + element.paddingRight;
       } else {
         element.x = 0;
         element.y = 0;

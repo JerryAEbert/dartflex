@@ -3,14 +3,42 @@ part of dartflex.components;
 class ListRenderer extends ListWrapper {
   
   List<IItemRenderer> _itemRenderers;
+  
   Group _scrollTarget;
-  bool _hasOwnScroller = true;
   
   //---------------------------------
   //
   // Public properties
   //
   //---------------------------------
+  
+  //---------------------------------
+  // width
+  //---------------------------------
+  
+  void set width(int value) {
+    if (value != _width) {
+      super.width = value;
+      
+      if (_dataProvider != null) {
+        _updateAfterScrollPositionChanged(false);
+      }
+    }
+  }
+  
+  //---------------------------------
+  // height
+  //---------------------------------
+  
+  void set height(int value) {
+    if (value != _height) {
+      super.height = value;
+      
+      if (_dataProvider != null) {
+        _updateAfterScrollPositionChanged(false);
+      }
+    }
+  }
   
   //---------------------------------
   // orientation
@@ -73,7 +101,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      invalidateProperties();
+      _updateAfterScrollPositionChanged(false);
     }
   }
   
@@ -94,7 +122,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      invalidateProperties();
+      _updateAfterScrollPositionChanged(false);
     }
   }
   
@@ -115,7 +143,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      invalidateProperties();
+      _updateAfterScrollPositionChanged(false);
     }
   }
   
@@ -136,7 +164,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      invalidateProperties();
+      _updateAfterScrollPositionChanged(false);
     }
   }
   
@@ -157,8 +185,22 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      _updateVisibleItemRenderers();
-      _updateLayout();
+      _updateAfterScrollPositionChanged(true);
+    }
+  }
+  
+  //---------------------------------
+  // rowSpacing
+  //---------------------------------
+  
+  int _rowSpacing = 0;
+  
+  int get rowSpacing => _rowSpacing;
+  set rowSpacing(int value) {
+    if (value != _rowSpacing) {
+      _rowSpacing = value;
+      
+      invalidateProperties();
     }
   }
   
@@ -194,7 +236,7 @@ class ListRenderer extends ListWrapper {
         _rowHeight = 0;
         _rowPercentHeight = 100.0;
         
-        horizontalScrollPolicy = _hasOwnScroller ? ScrollPolicy.AUTO : ScrollPolicy.NONE;
+        horizontalScrollPolicy = ScrollPolicy.AUTO;
         verticalScrollPolicy = ScrollPolicy.NONE;
       } else if (orientation == 'vertical') {
         defaultLayout = new VerticalLayout();
@@ -203,20 +245,31 @@ class ListRenderer extends ListWrapper {
         _colPercentWidth = 100.0;
         
         horizontalScrollPolicy = ScrollPolicy.NONE;
-        verticalScrollPolicy = _hasOwnScroller ? ScrollPolicy.AUTO : ScrollPolicy.NONE;
+        verticalScrollPolicy = ScrollPolicy.AUTO;
+      } else if (orientation == 'grid') {
+        defaultLayout = new VerticalLayout(constrainToBounds: false);
+        
+        _colWidth = 0;
+        _colPercentWidth = 100.0;
+        
+        verticalScrollPolicy = ScrollPolicy.AUTO;
       }
       
       defaultLayout.useVirtualLayout = true;
-      defaultLayout.gap = 0;
+      defaultLayout.gap = _rowSpacing;
       
       layout = defaultLayout;
+    }
+    
+    if (_layout != null) {
+      _layout.gap = _rowSpacing;
     }
     
     super._commitProperties();
   }
   
   void _createChildren() {
-    DivElement container = new DivElement();
+    final DivElement container = new DivElement();
     
     _scrollTarget = new Group();
     
@@ -226,8 +279,7 @@ class ListRenderer extends ListWrapper {
     
     _setControl(container);
     
-    container.style.border = '1px solid #808080';
-    container.style.backgroundColor = '#ffffff';
+    container.style.cssText = 'border: 1px solid rgb(128, 128, 128); background-color: rgb(255, 255, 255);';
     
     container.onScroll.listen(_container_scrollHandler);
     
@@ -240,6 +292,22 @@ class ListRenderer extends ListWrapper {
     }
     
     removeAll();
+    
+    add(_scrollTarget);
+  }
+  
+  void _updateRenderer(IItemRenderer renderer) {
+    if (_colWidth > 0) {
+      renderer.width = _colWidth;
+    } else if (_colPercentWidth > .0) {
+      renderer.percentWidth = _colPercentWidth;
+    }
+    
+    if (_rowHeight > 0) {
+      renderer.height = _rowHeight;
+    } else if (_rowPercentHeight > .0) {
+      renderer.percentHeight = _rowPercentHeight;
+    }
   }
   
   void _createElement(Object item, int index) {
@@ -247,25 +315,23 @@ class ListRenderer extends ListWrapper {
       _itemRenderers = new List<IItemRenderer>();
     }
     
-    IItemRenderer renderer = _itemRendererFactory.immediateIntance();
+    final IItemRenderer renderer = _itemRendererFactory.immediateInstance()
+      ..index = index;
     
-    if (_colWidth > 0) {
-      renderer.width = _colWidth;
-    } else {
-      renderer.percentWidth = _colPercentWidth;
-    }
-    
-    if (_rowHeight > 0) {
-      renderer.height = _rowHeight;
-    } else {
-      renderer.percentHeight = _rowPercentHeight;
-    }
+    _updateRenderer(renderer);
     
     _itemRenderers.add(renderer);
     
     renderer['controlChanged'] = _itemRenderer_controlChangedHandler;
     
     add(renderer);
+    
+    dispatch(
+        new FrameworkEvent(
+            'rendererAdded',
+            relatedObject: renderer
+        )
+    );
     
     /*Future rendererFuture = _itemRendererFactory.futureInstance();
     
@@ -316,47 +382,56 @@ class ListRenderer extends ListWrapper {
   }
   
   int _getPageOffset() {
-    return _hasOwnScroller ? _scrollPosition : 0;
+    return _scrollPosition;
   }
   
   int _getPageSize() {
     return (_dataProvider.length * _getPageItemSize());
   }
   
-  void _updateElements() {
+  void remove(UIWrapper element) {
+    super.remove(element);
+    
+    if (_itemRenderers != null) {
+      _itemRenderers.remove(element);
+    }
+  }
+  
+  bool _updateElements() {
+    final bool hasWidth = ((_colWidth > 0) || (_colPercentWidth > .0));
+    final bool hasHeight = ((_rowHeight > 0) || (_rowPercentHeight > .0));
+    
     if (
         (_itemRendererFactory != null) &&
-        (
-            (_colWidth > 0) ||
-            (_colPercentWidth > .0)
-        ) &&
-        (
-            (_rowHeight > 0) ||
-            (_rowPercentHeight > .0)
-        )
+        hasWidth &&
+        hasHeight
     ) {
-      bool isVerticalLayout = (_layout is VerticalLayout);
+      final bool isVerticalLayout = (_layout is VerticalLayout);
       int elementsRequired;
       
       if (isVerticalLayout) {
         elementsRequired = min(
-            ((_height / _rowHeight).toInt() + 2),
+            ((_height / _rowHeight).toInt() + 1),
             _dataProvider.length
         );
       } else {
         elementsRequired = min(
-            ((_width / _colWidth).toInt() + 2),
+            ((_width / _colWidth).toInt() + 1),
             _dataProvider.length
         );
       }
       
       Object element;
-      int existingLen = (_itemRenderers != null) ? _itemRenderers.length : 0;
-      int len = elementsRequired - existingLen;
+      final int existingLen = (_itemRenderers != null) ? _itemRenderers.length : 0;
+      final int len = elementsRequired - existingLen;
       int i;
       
+      for (i=len; i<0; i++) {
+        remove(_itemRenderers.last);
+      }
+      
       for (i=0; i<len; i++) {
-        _createElement(null, -1);
+        _createElement(null, i);
       }
       
       if (isVerticalLayout) {
@@ -368,29 +443,84 @@ class ListRenderer extends ListWrapper {
       }
       
       if (len > 0) {
-        _updateVisibleItemRenderers();
-        _updateLayout();
+        _updateAfterScrollPositionChanged(false);
+        
+        return true;
       }
+    }
+    
+    return false;
+  }
+  
+  void _updateAfterScrollPositionChanged(bool isImmediateUpdate) {
+    if (
+        (_dataProvider != null) &&
+        !_updateElements()
+    ) {
+      _updateVisibleItemRenderers();
+    }
+    
+    if (isImmediateUpdate) {
+      _updateLayout();
+    } else {
+      later > _updateLayout;
     }
   }
   
-  void _updateLayout() {
-    _updateElements();
-    
-    later > super._updateLayout;
-  }
-  
   void _updateVisibleItemRenderers() {
+    final List<UIWrapper> newChildren = new List<UIWrapper>();
+    final List<Element> elementsToSort = new List<Element>();
+    final int dpLen = _dataProvider.length;
+    final int firstIndex = (_scrollPosition / _getPageItemSize()).toInt();
+    final int irLen = _itemRenderers.length;
+    final int len = firstIndex + irLen;
+    
     Object data;
     IItemRenderer renderer;
-    int dpLen = _dataProvider.length;
-    int firstIndex = (_scrollPosition / _getPageItemSize()).toInt();
-    int len = firstIndex + _itemRenderers.length;
     int rendererIndex = 0;
     int i;
     
+    //
+    // START: sort the renderers, this will minimize the amount of updates needed when recycling
+    //
+    
+    _itemRenderers.sort(
+      (IItemRenderer rendererA, IItemRenderer rendererB) {
+        int sortIndexA = rendererA.index - firstIndex;
+        int sortIndexB = rendererB.index - firstIndex;
+        
+        if (sortIndexA >= irLen) {
+          sortIndexA = -sortIndexA;
+        } else if (sortIndexA < 0) {
+          sortIndexA += 1000000;
+        }
+        
+        if (sortIndexB >= irLen) {
+          sortIndexB = -sortIndexB;
+        } else if (sortIndexB < 0) {
+          sortIndexB += 1000000;
+        }
+        
+        return sortIndexA.compareTo(sortIndexB);
+      }
+    );
+    
+    for (i=0; i<irLen; i++) {
+      newChildren.addLast(_itemRenderers[i]);
+    }
+    
+    _children.removeAll(newChildren);
+    _children.addAll(newChildren);
+    
+    //
+    // END
+    //
+    
     for (i=firstIndex; i<len; i++) {
-      renderer = _itemRenderers[rendererIndex++];
+      renderer = _itemRenderers[rendererIndex++]
+        ..index = i;
+      
+      _updateRenderer(renderer);
       
       if (i < dpLen) {
         data = _dataProvider[i];
@@ -407,15 +537,15 @@ class ListRenderer extends ListWrapper {
       }
       
       renderer.data = ((_labelFunction != null) && (data != null)) ? _labelFunction(data) : data;
-      renderer.invalidateData();
     }
   }
   
   void _handleMouseInteraction(Event event) {
+    final Element target = event.currentTarget as Element;
+    final int firstIndex = (_scrollPosition / _getPageItemSize()).toInt();
+    
     IItemRenderer renderer;
     Object newSelectedItem;
-    Element target = event.currentTarget as Element;
-    int firstIndex = (_scrollPosition / _getPageItemSize()).toInt();
     int i = _itemRenderers.length;
     
     while (i > 0) {
@@ -445,10 +575,17 @@ class ListRenderer extends ListWrapper {
   
   void _container_scrollHandler(Event event) {
     scrollPosition = (_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft;
+    
+    dispatch(
+      new FrameworkEvent(
+        'scrollChanged',
+        relatedObject: _control
+      )    
+    );
   }
   
   void _itemRenderer_controlChangedHandler(FrameworkEvent event) {
-    DivElement renderer = event.relatedObject as DivElement;
+    final DivElement renderer = event.relatedObject as DivElement;
     
     renderer.onMouseOver.listen(_handleMouseInteraction);
     renderer.onMouseOut.listen(_handleMouseInteraction);

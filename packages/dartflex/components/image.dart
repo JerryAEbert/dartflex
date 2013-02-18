@@ -30,26 +30,6 @@ class Image extends UIWrapper {
   }
   
   //---------------------------------
-  // aspectRatio
-  //---------------------------------
-  
-  String _aspectRatio = 'cover';
-  bool _isAspectRatioChanged = false;
-  
-  String get aspectRatio => _aspectRatio;
-  set aspectRatio(String value) {
-    if (value != _aspectRatio) {
-      _aspectRatio = value;
-      
-      dispatch(
-          new FrameworkEvent('aspectRatioChanged') 
-      );
-      
-      invalidateProperties();
-    }
-  }
-  
-  //---------------------------------
   //
   // Private properties
   //
@@ -84,7 +64,7 @@ class Image extends UIWrapper {
       
       controlCast.src = _source;
       
-      controlCast.style.aspectRatio = _aspectRatio;
+      controlCast.style.overflow = 'hidden';
       
       _setControl(controlCast);
     }
@@ -103,18 +83,15 @@ class Image extends UIWrapper {
         
         controlCast.src = _source;
       }
-      
-      if (_isAspectRatioChanged) {
-        _isAspectRatioChanged = false;
-        
-        controlCast.style.objectFit = _aspectRatio;
-      }
     }
   }
   
   void _control_loadHandler(Event event) {
     dispatch(
-        new FrameworkEvent('loadComplete') 
+        new FrameworkEvent(
+          'loadComplete',
+          relatedObject: event.currentTarget
+        )
     );
   }
 }

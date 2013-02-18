@@ -10,8 +10,9 @@ import 'package:dartflex/layout/layout.dart';
 import 'package:demo/demo.dart';
 
 void main() {
-  initContainer01();
-  initContainer02();
+  dataGridSetup();
+  //initContainer01();
+  //initContainer02();
   
   /*
   
@@ -32,7 +33,77 @@ void main() {
   //DivElement aaa; aaa.style.overflowWrap
 }
 
-void initContainer01() {
+void dataGridSetup() {
+  DataGrid grid = new DataGrid()
+  ..percentWidth = 100.0
+  ..percentHeight = 100.0
+  ..headerHeight = 30
+  ..rowHeight = 30
+  ..columnSpacing = 0
+  ..rowSpacing = 0
+  ..dataProvider = createDataProvider(dpLen: 5000)
+  ..columns = new ListCollection(
+    source: [
+      new DataGridColumn()
+      ..width = 60
+      ..headerData = { 'label' : 'id', 'property' : 'id' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: IdItemRenderer.construct),
+      
+      new DataGridColumn()
+      ..width = 60
+      ..headerData = { 'label' : '', 'property' : 'imageNumber' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: ImageItemRenderer.construct),
+      
+      new DataGridColumn()
+      ..width = 220
+      ..headerData = { 'label' : 'full name', 'property' : 'fullname' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: NameItemRenderer.construct),
+      
+      new DataGridColumn()
+      ..width = 170
+      ..headerData = { 'label' : 'job', 'property' : 'job' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: JobItemRenderer.construct),
+      
+      new DataGridColumn()
+      ..width = 154
+      ..headerData = { 'label' : 'phone nr', 'property' : 'phone' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: PhoneItemRenderer.construct),
+      
+      new DataGridColumn()
+      ..width = 220
+      ..headerData = { 'label' : 'manager', 'property' : 'manager' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: ManagerItemRenderer.construct),
+      
+      new DataGridColumn()
+      ..minWidth = 160
+      ..percentWidth = 100.0
+      ..headerData = { 'label' : 'rating', 'property' : 'rating' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: RatingItemRenderer.construct)
+    ]
+  );
+  
+  /*_listRenderer = new ListRenderer(orientation: 'vertical')
+  //..itemRendererFactory = new ClassFactory('dartflex.components', 'ItemRenderer')
+  ..itemRendererFactory = new ClassFactory(constructorMethod: DemoItemRenderer.construct)
+  ..width = 400
+  ..percentHeight = 100.0
+  ..rowHeight = 50
+  ..dataProvider = createDataProvider(dpLen: 5000, labelMain: 'Employee nr.');*/
+  
+  HGroup container01 = new HGroup(elementId: '#target')
+  ..width = 600
+  ..percentHeight = 100.0
+  ..add(grid);
+}
+
+/*void initContainer01() {
   VGroup divContainer = new VGroup(elementId: '#container01')
   ..percentWidth = 100.0
   ..percentHeight = 100.0;
@@ -64,9 +135,9 @@ void initContainer01() {
   
   divContainer.add(button);
   divContainer.add(box);
-}
+}*/
 
-void initContainerX() {
+/*void initContainerX() {
   VGroup container = new VGroup(elementId: '#container01')
     ..percentWidth = 100.0
     ..percentHeight = 100.0;
@@ -150,9 +221,9 @@ void initContainerX() {
 }
 
 ListRenderer _listRenderer;
-RichText _innerHtmlDisplay;
+RichText _innerHtmlDisplay;*/
 
-void initContainer02() {
+/*void initContainer02() {
   _listRenderer = new ListRenderer(orientation: 'horizontal')
   //..itemRendererFactory = new ClassFactory('dartflex.components', 'ItemRenderer')
   ..itemRendererFactory = new ClassFactory(constructorMethod: DemoItemRenderer.construct)
@@ -172,8 +243,91 @@ void initContainer02() {
   ..add(_innerHtmlDisplay);
 }
 
-ListItem createListItem({String label: 'Option:', int index: -1}) {
-  ListItem item = new ListItem('$label $index');
+
+
+String control_labelHandler(ListItem item) {
+  return item.label;
+}
+
+String getLoremIpsum() {
+  return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras consectetur sem vitae nibh vulputate a tempus neque feugiat. Nam pellentesque diam nec nunc eleifend ornare. In sapien nisl, luctus in laoreet at, laoreet in mauris. Nullam tempor leo a felis fringilla ut scelerisque mi mollis. In eu commodo arcu. Sed nec tincidunt lectus. Morbi consectetur laoreet tellus, nec aliquet felis congue a. Integer in sem sit amet nisl bibendum rhoncus. Praesent eget libero urna. Mauris et sodales sem. Curabitur vel nisi vel sapien interdum euismod. Integer malesuada, purus nec viverra dapibus, diam ligula scelerisque risus, in dictum nisl neque non diam. Fusce posuere urna a lectus aliquam malesuada.';
+}*/
+
+String getRandomName() {
+  Random rnd = new Random();
+  
+  List<String> firstNames = [
+    'Neil', 'Oleg', 'Arkadiusz', 'John', 'Terry', 'Alan', 'Marc', 'Jackson', 'Ian', 'William', 'Robert', 'Steve', 'Richard', 'Dave', 'Alec', 'Walter', 'George', 'Isac', 'Brian', 'Clyde', 'Eric', 'Frank', 'Humphrey', 'Louis', 'Norman', 'Oswald', 'Peter', 'Quinten', 'Vinny', 'Xavier',
+    'Margareth', 'Anna', 'Bethany', 'Cynthia', 'Dana', 'Eloise', 'Frances', 'Gerry', 'Hannah', 'Indra', 'Jasmine', 'Kelcy', 'Louise', 'Mandy', 'Nicole', 'Natasha', 'Oscar', 'Patricia', 'Rita', 'Samantha', 'Tiffany', 'Ursula', 'Vanessa', 'Wendy', 'Zara',
+    'Jacky', 'Christopher', 'Annabel', 'Bastian', 'Clyde', 'Desmond', 'Erika', 'Fabienne', 'Gunther', 'Halley', 'Issa', 'John', 'Morgan', 'Nils', 'Ona', 'Uma', 'Homer', 'Bob', 'Anatoly', 'Aurelie', 'Seymour', 'Tony', 'Randy',
+    'Ashley', 'Adam', 'Benedict', 'Chester', 'Dough', 'Evram', 'Fritz', 'Gustav', 'Hendrik', 'Iris', 'Jacquelyn', 'Kendra', 'Lara', 'Morrigan', 'Nora', 'Ophelia', 'Parker', 'Roberta', 'Sandra', 'Tilley', 'Valeria', 'Willy', 'Xandra', 'Zico',
+    'Ashton', 'Carlton', 'Dick', 'Everett', 'Fabrice', 'August', 'Dakota', 'Nigel', 'Paris', 'Angela', 'Adnan', 'Alois', 'Benjamin', 'Benny', 'Bea', 'Bonny', 'Belinda',
+    'Cory', 'Christian', 'Cale', 'Carlyle', 'Finny', 'Francesca', 'Flavio', 'Fernando', 'Ferry',
+    'Ginny', 'Gregory', 'Gaelle', 'Gerd', 'Gonda', 'Gary', 'Gomez', 'Gaetan', 'Genaro',
+    'Hadley', 'Horace', 'Horatio', 'Hermes', 'Higgs', 'Hendrietta', 'Hugh', 'Halle', 'Hiatt', 'Hernando',
+    'Indy', 'Janice', 'Jetta', 'Linda', 'Lorelai', 'Lindsay', 'Lucas', 'Lucio',
+    'Matthew', 'Moses', 'Mohammed', 'Marcus'
+  ];
+  
+  List<String> lastNames = [
+   'Anderton', 'Burgundy', 'Carruthers', 'Dillan', 'Erickson', 'Fenton', 'Gyllenhaal', 'Humphries', 'Isaksson', 'Jones', 'Kensington', 'Lane', 'McNamara', 'Newton', 'O\'Riley', 'Peterson', 'Quint', 'Roy', 'Stephenson', 'Truman', 'Ulman', 'Van Dyke', 'Wellington', 'Zalman',
+   'Abigail', 'Bryce', 'Cole', 'Delmond', 'Ellis', 'Foley', 'Gordon', 'Halifax', 'Illinois', 'Johnson', 'Kelly', 'Lampard', 'Masterson', 'Nightingale', 'Ordaz', 'Pettigrew', 'Richardson', 'Smith', 'Trafalgar', 'Unsworth', 'Vonnegut', 'Wrexham',
+   'Argyle', 'Bolton', 'Castor', 'Darlington', 'Eaton', 'Fitzgerald', 'Gains', 'Ivanov', 'Jorgenssen', 'Klimowicz', 'Lovren', 'Middleton', 'Naysmith', 'Onassis', 'Parkinson', 'Ruthersford', 'Swindon', 'Tygart', 'Volante', 'Williams',
+   'Arvendsen', 'Blackwell', 'Carter', 'Doncaster', 'Evergreen', 'Fazekas', 'Germaine', 'Jacobson', 'Kubrick', 'Lewandowski', 'Mendelson', 'Nilsson', 'Ocean', 'Plumber', 'Richter', 'Styles', 'Trifton', 'Watergate', 'Zorba',
+   'Aggerton', 'Burke', 'Coleman', 'Denver', 'Finkelstein', 'Georges', 'Jacksonville', 'Kanaan', 'Lafferty', 'Michigan', 'Nordberg', 'O\'Hara', 'Parker', 'Rover', 'Tallys', 'Upson', 'Van Diemen', 'Zachman',
+   'Austin', 'Belford', 'Cordoba', 'Doyle', 'Frost', 'Gaile', 'Hettysburg', 'Inverness', 'Jagan', 'Kendry', 'Morten', 'Nedry', 'Osmond', 'Pharkemeiser', 'Rickers', 'Timberland', 'Kirkland', 'Vaughn', 'Wilkes',
+   'Agger', 'Belvedere', 'Chesterfield', 'Dalton', 'Fowles', 'Gorges', 'Haliburton', 'Icarus', 'Kuda', 'Lanister', 'McIntosh', 'Newell', 'Lloyd', 'Pasadena', 'Rock', 'Tasman', 'Ulysses', 'Varnes', 'Walther', 'Zamora',
+   'Green', 'Black', 'White', 'Redgrove', 'Wyoming', 'Mansell'
+   ];
+  
+  String first = firstNames[rnd.nextInt(firstNames.length)];
+  String last = lastNames[rnd.nextInt(lastNames.length)];
+  
+  return '$first $last';
+}
+
+String getRandomJob() {
+  Random rnd = new Random();
+  
+  List<String> jobs = [
+    'manager', 'it expert', 'accountant', 'human resources', 'r & d', 'security', 'freelance',
+    'unemployed', 'electrician', 'plumber', 'fireman', 'policeman', 'race car driver', 'stuntman',
+    'actor', 'entertainer', 'pro football player', 'nurse', 'volunteer', 'consultant', 'lawyer',
+    'artist', 'politician', 'retired', 'director'
+  ];
+  
+  String job = jobs[rnd.nextInt(jobs.length)];
+  
+  return '$job';
+}
+
+String getRandomPhone() {
+  Random rnd = new Random();
+  
+  int a = rnd.nextInt(9);
+  int b = rnd.nextInt(9);
+  int c = rnd.nextInt(9);
+  int d = rnd.nextInt(9);
+  int e = rnd.nextInt(9);
+  int f = rnd.nextInt(9);
+  int g = rnd.nextInt(9);
+  int h = rnd.nextInt(9);
+  int i = rnd.nextInt(9);
+  
+  return '5$b$c - $d$e$f$g$h$i';
+}
+
+Map createListItem(int index) {
+  Map item = new Map();
+  Random rnd = new Random();
+  
+  item['id'] = index;
+  item['imageNumber'] = rnd.nextInt(229);
+  item['rating'] = rnd.nextInt(5) + 1;
+  item['fullname'] = getRandomName();
+  item['job'] = getRandomJob();
+  item['phone'] = getRandomPhone();
+  item['manager'] = getRandomName();
   
   return item;
 }
@@ -183,50 +337,8 @@ ListCollection createDataProvider({int dpLen: 10, String labelMain: 'Option:'}) 
   int i;
   
   for (i=0; i<dpLen; i++) {
-    dataProvider + createListItem(label: labelMain, index: i);
+    dataProvider + createListItem(i);
   }
   
   return dataProvider;
-}
-
-String control_labelHandler(ListItem item) {
-  return item.label;
-}
-
-String getLoremIpsum() {
-  return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras consectetur sem vitae nibh vulputate a tempus neque feugiat. Nam pellentesque diam nec nunc eleifend ornare. In sapien nisl, luctus in laoreet at, laoreet in mauris. Nullam tempor leo a felis fringilla ut scelerisque mi mollis. In eu commodo arcu. Sed nec tincidunt lectus. Morbi consectetur laoreet tellus, nec aliquet felis congue a. Integer in sem sit amet nisl bibendum rhoncus. Praesent eget libero urna. Mauris et sodales sem. Curabitur vel nisi vel sapien interdum euismod. Integer malesuada, purus nec viverra dapibus, diam ligula scelerisque risus, in dictum nisl neque non diam. Fusce posuere urna a lectus aliquam malesuada.';
-}
-
-abstract class Entity {}
-
-class ListItem implements Entity {
-  
-  //---------------------------------
-  //
-  // Constructor
-  //
-  //---------------------------------
-  
-  ListItem(String label) {
-    Random rnd = new Random();
-    
-    _label = label;
-    
-    rating01 = rnd.nextInt(10);
-    rating02 = rnd.nextInt(10);
-  }
-  
-  int rating01;
-  int rating02;
-  
-  //---------------------------------
-  //
-  // Public properties
-  //
-  //---------------------------------
-  
-  String _label;
-  
-  String get label => _label;
-  set label(String value) => _label = value;
 }

@@ -15,6 +15,9 @@ abstract class IUIWrapper implements IFrameworkEventDispatcher {
   bool get includeInLayout;
   set includeInLayout(bool value);
   
+  bool get autoSize;
+  set autoSize(bool value);
+  
 }
 
 class UIWrapper implements IUIWrapper {
@@ -50,7 +53,9 @@ class UIWrapper implements IUIWrapper {
   
   Graphics get graphics {
     if (_graphics == null) {
-      _graphics = new Graphics();
+      _graphics = new Graphics()
+      ..width = _width
+      ..height = _height;
       
       add(_graphics, prepend: true);
     }
@@ -83,6 +88,30 @@ class UIWrapper implements IUIWrapper {
   }
   
   //---------------------------------
+  // autoSize
+  //---------------------------------
+  
+  bool _autoSize = true;
+  
+  bool get autoSize => _autoSize;
+  
+  set autoSize(bool value) {
+    if (value != _autoSize) {
+      _autoSize = value;
+      
+      dispatch(
+        new FrameworkEvent('autoSizeChanged') 
+      );
+      
+      if (_owner != null) {
+        _owner.invalidateProperties();
+      }
+      
+      invalidateProperties();
+    }
+  }
+  
+  //---------------------------------
   // x
   //---------------------------------
   
@@ -98,9 +127,7 @@ class UIWrapper implements IUIWrapper {
         new FrameworkEvent('xChanged') 
       );
       
-      _updateControl();
-      
-      invalidateProperties();
+      _updateControl(1);
     }
   }
   
@@ -120,9 +147,7 @@ class UIWrapper implements IUIWrapper {
         new FrameworkEvent('yChanged') 
       );
       
-      _updateControl();
-      
-      invalidateProperties();
+      _updateControl(2);
     }
   }
   
@@ -142,7 +167,7 @@ class UIWrapper implements IUIWrapper {
         new FrameworkEvent('widthChanged') 
       );
       
-      _updateControl();
+      _updateControl(3);
       
       invalidateProperties();
     }
@@ -184,7 +209,7 @@ class UIWrapper implements IUIWrapper {
         new FrameworkEvent('heightChanged')
       );
       
-      _updateControl();
+      _updateControl(4);
       
       invalidateProperties();
     }
@@ -319,7 +344,7 @@ class UIWrapper implements IUIWrapper {
   // later
   //---------------------------------
   
-  UpdateManager _later = new UpdateManager();
+  UpdateManager _later;
   
   UpdateManager get later => _later;
   
@@ -370,6 +395,7 @@ class UIWrapper implements IUIWrapper {
   //---------------------------------
   
   UIWrapper({String elementId: null}) {
+    _later = new UpdateManager();
     _eventDispatcher = new FrameworkEventDispatcher(dispatcher: this);
     
     _elementId = elementId;
@@ -406,7 +432,7 @@ class UIWrapper implements IUIWrapper {
     
     if (_control == null) {
       if (prepend) {
-        List<UIWrapper> newList = new List<UIWrapper>();
+        final List<UIWrapper> newList = new List<UIWrapper>();
         
         newList.add(element);
         newList.addAll(_addLaterElements);
@@ -424,16 +450,16 @@ class UIWrapper implements IUIWrapper {
       element._initialize();
       
       if (prepend) {
-        List<Element> newList = new List<Element>();
+        final List<Element> newElementList = new List<Element>();
         
-        newList.add(element.control);
-        newList.addAll(_owner._control.children);
+        newElementList.add(element.control);
+        newElementList.addAll(_owner._control.children);
         
         _owner._control.children.removeAll(_owner._control.children);
         
-        _owner._control.children.addAll(newList); 
+        _owner._control.children.addAll(newElementList); 
       } else {
-        _control.children.add(element.control); 
+        _control.append(element._control);
       }
       
       invalidateProperties();
@@ -468,6 +494,8 @@ class UIWrapper implements IUIWrapper {
   void _setControl(Element element) {
     _control = element;
     
+    _updateControl(5);
+    
     dispatch(
       new FrameworkEvent(
           'controlChanged',
@@ -478,17 +506,25 @@ class UIWrapper implements IUIWrapper {
     invalidateProperties();
   }
   
-  void _updateControl() {
+  void _updateControl(int type) {
+    final String px = 'px';
+    
     if (_control != null) {
       if (_elementId == null) {
-        _control.style.left = _x.toString().concat('px');
-        _control.style.top = _y.toString().concat('px');
-        _control.style.width = _width.toString().concat('px');
-        _control.style.height = _height.toString().concat('px');
-      } else {
+        switch (type) {
+          case 1 : _control.style.setProperty('left', '$_x$px', ''); break;
+          case 2 : _control.style.setProperty('top', '$_y$px', ''); break;
+          case 3 : _control.style.setProperty('width', '$_width$px', ''); break;
+          case 4 : _control.style.setProperty('height', '$_height$px', ''); break;
+          case 5 : 
+            _control.style.cssText = 'left:$_x$px;top:$_y$px;width:$_width$px;height:$_height$px;';
+            
+            break;
+        }
+      } /*else {
         width = _control.clientWidth;
         height = _control.clientHeight;
-      }
+      }*/
     }
   }
   
@@ -496,7 +532,11 @@ class UIWrapper implements IUIWrapper {
     if (_elementId != null) {
       _control = query(_elementId);
       
-      later > _invalidateSize;
+      //_control.$dom_addEventListener('resize', _invalidateSize, true);
+      //_control.document.$dom_addEventListener('resize', _invalidateSize, true);
+      _control.document.window.$dom_addEventListener('resize', _invalidateSize, true);
+      
+      later > _updateSize;
     }
   }
   
@@ -547,8 +587,11 @@ class UIWrapper implements IUIWrapper {
         while (i > 0) {
           element = _children[--i];
           
-          if (!element.includeInLayout) {
-            element._control.style.position = 'absolute';
+          if (
+              !element.includeInLayout &&
+              (element.control.style.position != 'absolute')
+          ) {
+            element.control.style.position = 'absolute';
           }
           
           element.x = _x;
@@ -564,16 +607,21 @@ class UIWrapper implements IUIWrapper {
   int _getPageOffset() => 0;
   int _getPageSize() => 0;
   
-  void _invalidateSize() {
+  void _invalidateSize(Event event) {
+    later > _updateSize;
+  }
+  
+  void _updateSize() {
     width = _control.clientWidth;
     height = _control.clientHeight;
-    
-    if (_owner == null) {
-      later > _invalidateSize;
-    }
   }
   
   void _addAllPendingElements() {
+    _eventDispatcher.removeEventListener(
+        'controlChanged', 
+        _addAllPendingElements
+    );
+    
     _addLaterElements.forEach(
         (element) => add(element)
     );

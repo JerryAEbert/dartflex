@@ -21,7 +21,7 @@ class ClassFactory {
     
   }
   
-  Object immediateIntance() {
+  Object immediateInstance() {
     return _constructorMethod();
   }
   

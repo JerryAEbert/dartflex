@@ -29,6 +29,15 @@ class VerticalLayout implements ILayout {
   
   int get gap => _gap;
   set gap(int value) => _gap = value;
+  
+  //---------------------------------
+  // constrainToBounds
+  //---------------------------------
+  
+  bool _constrainToBounds = true;
+  
+  bool get constrainToBounds => _constrainToBounds;
+  set constrainToBounds(bool value) => _constrainToBounds = value;
 
   //---------------------------------
   //
@@ -36,7 +45,8 @@ class VerticalLayout implements ILayout {
   //
   //---------------------------------
   
-  VerticalLayout() {
+  VerticalLayout({bool constrainToBounds: true}) {
+    _constrainToBounds = constrainToBounds;
   }
   
   //---------------------------------
@@ -76,7 +86,9 @@ class VerticalLayout implements ILayout {
     for (i=0; i<len; i++) {
       element = elements[i];
       
-      element.control.style.position = 'absolute';
+      if (element.control.style.position != 'absolute') {
+        element.control.style.position = 'absolute';
+      }
       
       if (element.includeInLayout) {
         if (element.percentWidth > 0.0) {
@@ -94,21 +106,28 @@ class VerticalLayout implements ILayout {
         w = (w == null) ? 0 : w;
         h = (h == null) ? 0 : h;
         
-        element.x = (width * .5 - w * .5).toInt();
+        if (_constrainToBounds) {
+          element.x = (width * .5 - w * .5).toInt();
+        }
         
         if (
             (pageSize == 0) || 
             ((offset + h) <= pageSize)
         ) {
-          element.y = offset;
+          element.y = offset + element.paddingTop;
         } else {
           element.y = 0;
         }
         
-        element.width = w;
-        element.height = h;
+        if (_constrainToBounds && element.autoSize) {
+          element.width = w;
+        }
         
-        offset += h + _gap;
+        if (element.autoSize) {
+          element.height = h;
+        }
+        
+        offset += h + _gap + element.paddingTop + element.paddingBottom;
       } else {
         element.x = 0;
         element.y = 0;

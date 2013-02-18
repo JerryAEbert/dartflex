@@ -30,6 +30,27 @@ class RichText extends UIWrapper {
   }
   
   //---------------------------------
+  // align
+  //---------------------------------
+  
+  String _align = 'left';
+  
+  String get align => _align;
+  set align(String value) {
+    if (value != _align) {
+      _align = value;
+      
+      dispatch(
+        new FrameworkEvent(
+          'alignChanged'
+        )    
+      );
+      
+      later > _commitText;
+    }
+  }
+  
+  //---------------------------------
   //
   // Constructor
   //
@@ -62,7 +83,9 @@ class RichText extends UIWrapper {
     if (_control != null) {
       SpanElement element = _control as SpanElement;
       
-      element.text = _text;
+      element.innerHtml = _text;
+      
+      element.style.textAlign = _align;
     } else {
       later > _commitText;
     }

@@ -1,6 +1,7 @@
 library dartflex.components;
 
 import 'dart:async';
+import 'dart:core';
 import 'dart:html';
 import 'dart:math';
 import 'dart:mirrors';
@@ -14,6 +15,8 @@ part "accordion.dart";
 part "button.dart";
 part "combo_box.dart";
 part "data_grid.dart";
+part "data_grid_column.dart";
+part "data_grid_item_renderer.dart";
 part "hgroup.dart";
 part "graphics.dart";
 part "group.dart";

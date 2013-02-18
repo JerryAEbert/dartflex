@@ -1,6 +1,9 @@
 part of dartflex.components;
 
-abstract class IItemRenderer implements IFrameworkEventDispatcher, IUIWrapper {
+abstract class IItemRenderer implements IUIWrapper {
+  
+  int get index;
+  set index(int value);
   
   String get state;
   set state(String value);
@@ -44,6 +47,19 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   //---------------------------------
   
   //---------------------------------
+  // index
+  //---------------------------------
+  
+  int _index = 0;
+  
+  int get index => _index;
+  set index(int value) {
+    if (value != _index) {
+      _index = value;
+    }
+  }
+  
+  //---------------------------------
   // data
   //---------------------------------
   
@@ -69,7 +85,7 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
     if (value != _state) {
       _state = value;
       
-      _updateAfterInteraction();
+      later > _updateAfterInteraction;
     }
   }
   
@@ -86,7 +102,7 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
       _selected = value;
       _isSelectionInvalid = true;
       
-      _updateAfterInteraction();
+      later > _updateAfterInteraction;
     }
   }
   
@@ -107,12 +123,41 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   }
   
   //---------------------------------
+  // autoDrawBackground
+  //---------------------------------
+  
+  bool _autoDrawBackground;
+  
+  bool get autoDrawBackground => _autoDrawBackground;
+  set autoDrawBackground(bool value) {
+    if (value != _autoDrawBackground) {
+      _autoDrawBackground = value;
+    }
+  }
+  
+  //---------------------------------
+  // gap
+  //---------------------------------
+  
+  int _gap = 0;
+  
+  int get gap => _gap;
+  set gap(int value) {
+    if (value != _gap) {
+      _gap = value;
+      
+      later > _updateLayout;
+    }
+  }
+  
+  //---------------------------------
   //
   // Constructor
   //
   //---------------------------------
   
-  ItemRenderer({String elementId: null}) : super(elementId: null) {
+  ItemRenderer({String elementId: null, bool autoDrawBackground: true}) : super(elementId: null) {
+    _autoDrawBackground = autoDrawBackground;
   }
   
   static ItemRenderer construct() {
@@ -146,15 +191,17 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   void _createChildren() {
     super._createChildren();
     
-    _setControl(new DivElement());
+    DivElement container = new DivElement();
     
-    _selectIndicator = new Graphics();
-    
-    add(_selectIndicator, prepend: true);
+    _setControl(container);
     
     _control.style.overflow = 'hidden';
     
+    container.style.border = '1px solid #cccccc';
+    
     createChildren();
+    
+    later > _invalidateData;
   }
   
   void _invalidateData() {
@@ -164,7 +211,9 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   void _updateLayout() {
     super._updateLayout();
     
-    later > _updateAfterInteraction;
+    if (_autoDrawBackground) {
+      later > _updateAfterInteraction;
+    }
     
     updateLayout();
   }
@@ -172,10 +221,19 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   double _fraction;
   
   void _updateAfterInteraction() {
+    if (!_autoDrawBackground) {
+      return;
+    }
+    
     if (
         (_selectIndicator != null) &&
         (_selectIndicator.context != null)
     ) {
+      _selectIndicator.x = _x;
+      _selectIndicator.y = _y;
+      _selectIndicator.width = _width;
+      _selectIndicator.height = _height;
+      
       if (_selected) {
         if (_isSelectionInvalid) {
           _isSelectionInvalid = false;
@@ -197,6 +255,10 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
       } else {
         _selectIndicator.context.clearRect(0, 0, _width, _height);
       }
+    } else if (_selectIndicator == null) {
+      _selectIndicator = new Graphics();
+      
+      add(_selectIndicator, prepend: true);
     } else {
       later > _updateAfterInteraction;
     }

@@ -3,166 +3,77 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>dart:flex</title>
+    <title>dart:grid</title>
     <link rel="stylesheet" href="dartplay.css">
   </head>
   <body>
-    <h1 id="header1">Dart Flex : a proof of concept</h1>
+    <div id="target"></div>
     
-    <p id="header2">Advanced component example</p>
-    <p id="header2">01. ListCollection and a simple ComboBox</p>
-    <p id="foreword">
-      The following examples will build up to a full Flex style List component.<br><br>
-      
-      I'm taking a lot of shortcuts in this demo, you can find out more on <a href='http://flex.apache.org/'>Flex</a> or <a href='http://www.dartlang.org/'>Dart</a> if you wish,<br>
-      in short, Flex is a framework originally designed for rapid application development.<br><br>
-      
-      I decided to try and port some Flex basics in order to get up to speed with Dart,<br>
-      This is a small overview that doesn't go into too much detail.</p>
-    <p id="paragraph">
-      Flex uses a <a href='http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/mx/collections/ArrayCollection.html'>dataProvider</a> to present data into components, 
-      this dataProvider is actually a collection that dispatches events as items are added, 
-      changed or removed to it.<br><br>
-      
-      The goal is to be able to do updates on the dataProvider directly, 
-      which will then auto-reflect on the component.<br><br>
-      
-      First, we setup a dataProvider and add items, then the dataProvider is tied to a ComboBox component, 
-      which in its turns wraps a HTML Select element internally.<br>
-      Each item inside the dataProvider can be a complex data object, to present the item as a label in the ComboBox,
-      a label function is used, which will always return a String based representation of the item.</p>
     <textarea name="code" class="java" cols="60" rows="10">
-ListCollection createDataProvider({int dpLen: 10}) {
-    ListCollection dataProvider = new ListCollection();
-    int i;
-  
-    for (i=0; i<dpLen; i++) {
-      dataProvider + createListItem(label: 'Option:', index: i); // the '+' operator overload is a shortcut for dataProvider.add(item)
-    }
-  
-    return dataProvider;
-}
-
-ListItem createListItem({String label: 'Option:', int index: -1}) {
-  ListItem item = new ListItem('$label $index');
-  
-  return item;
-}
-
-abstract class Entity {}
-
-class ListItem implements Entity {
-  
-  ListItem(String label) { _label = label; }
-  
-  String _label;
-  
-  String get label => _label;
-  set label(String value) => _label = value;
-}</textarea>
-    <p id="paragraph">We now have a method <i>createDataProvider</i> to feed a component, as a first example, a simple ComboBox :</p>
-    <textarea name="code" class="java" cols="60" rows="10">
-void init() {
-  VGroup divContainer = new VGroup(elementId: '#container01')
+DataGrid grid = new DataGrid()
   ..percentWidth = 100.0
-  ..percentHeight = 100.0;
-  
-  ComboBox box = new ComboBox()
-  ..labelFunction = control_labelHandler
-  ..width = 120
-  ..height = 22
-  ..dataProvider = createDataProvider();
-  
-  Button button = new Button()
-  ..width = 100
-  ..height = 22
-  ..label = 'add item';
-  
-  button['click'] = (
-      (FrameworkEvent event) {
-        // on button click, add a new item directly to the dataProvider
-        // the comboBox will auto-update
-        ListItem item = createListItem(label: 'I\'m a new option! ', index: box.dataProvider.length);
-        
-        box.dataProvider + item;
-        
-        // alternatively, you could just type
-        // box + item;
-        // as well
-      }
-  );
-  
-  divContainer.add(button);
-  divContainer.add(box);
-}
+  ..percentHeight = 100.0
+  ..headerHeight = 30
+  ..rowHeight = 30
+  ..columnSpacing = 0
+  ..rowSpacing = 0
+  ..dataProvider = createDataProvider(dpLen: 5000)
+  ..columns = new ListCollection(
+    source: [
+      new DataGridColumn()
+      ..width = 60
+      ..headerData = { 'label' : 'id', 'property' : 'id' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: IdItemRenderer.construct),
+      
+      new DataGridColumn()
+      ..width = 60
+      ..headerData = { 'label' : '', 'property' : 'imageNumber' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: ImageItemRenderer.construct),
+      
+      new DataGridColumn()
+      ..width = 220
+      ..headerData = { 'label' : 'full name', 'property' : 'fullname' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: NameItemRenderer.construct),
+      
+      new DataGridColumn()
+      ..width = 170
+      ..headerData = { 'label' : 'job', 'property' : 'job' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: JobItemRenderer.construct),
+      
+      new DataGridColumn()
+      ..width = 154
+      ..headerData = { 'label' : 'phone nr', 'property' : 'phone' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: PhoneItemRenderer.construct),
+      
+      new DataGridColumn()
+      ..width = 220
+      ..headerData = { 'label' : 'manager', 'property' : 'manager' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: ManagerItemRenderer.construct),
+      
+      new DataGridColumn()
+      ..minWidth = 160
+      ..percentWidth = 100.0
+      ..headerData = { 'label' : 'rating', 'property' : 'rating' }
+      ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
+      ..columnItemRendererFactory = new ClassFactory(constructorMethod: RatingItemRenderer.construct)
+    ]
+);
     </textarea>
-    <div id="container01"></div>
-    <p id="header2">02. List component with renderer recycling</p>
-    <p id="paragraph">A more complex component is the Flex List,<br>
-    it also requires a dataProvider, and uses an item renderer to render the list rows.<br><br>
-    
-    <b>For performance reasons on longer lists, the List will not create an item renderer for each
-    individual row, instead, it will create one for each visible row to the user, and as the user scrolls
-    up or down, it will recycle the item renderers.</b><br><br>
-    Any dart:flex component also has a life cycle, much like their Flex counterparts.<br>
-    The actual dataProvider data is then passed on as item renderers recycle<br><br>
-    Open the developer console to inspect the List, and you'll see it only generates a few DIV boxes to render in,
-    regardless of the dataProvider size.<br><br>
-    In Flex, each component has a graphics property, which can be used to for example draw a complex background
-    behind a given component.<br>
-    The item renderers use this graphics, and it translates to a HTML Canvas element being placed behind the item renderer,
-    in the list, the graphics is used to draw the current selection status.<br>
-    When selecting a list row, it will also use a fade-in effect with the Canvas.</p>
-    <textarea name="code" class="java" cols="60" rows="10">
-ListRenderer listRenderer = new ListRenderer()
-//..itemRendererFactory = new ClassFactory('dartflex.components', 'ItemRenderer')
-..itemRendererFactory = new ClassFactory(constructorMethod: DemoItemRenderer.construct)
-..width = 400
-..percentHeight = 100.0
-..colPercentWidth = 100.0
-..rowHeight = 30
-..dataProvider = createDataProvider(dpLen: 1000, labelMain: 'Employee nr.');
-
-VGroup container01 = new VGroup(elementId: '#container02')
-..percentWidth = 100.0
-..percentHeight = 100.0
-..add(listRenderer);
-</textarea>
-    <div id="container02"></div>
-    <p id="paragraph">Below is the code found within the <i>createChildren</i> class of the item renderer,<br>
-    it's basically a label and 2 combo boxes, horizontally layed out, with default random values.</p>
-    <textarea name="code" class="java" cols="60" rows="10">
-_container = new HGroup()
-..percentWidth = 100.0
-..percentHeight = 100.0
-..gap = 10;
-
-_label = new RichText()
-..width = 120
-..height = 18;
-
-_selection01 = new ComboBox()
-..width = 120
-..height = 22
-..dataProvider = createDataProvider(dpLen: 100, labelMain: 'cost', modifier: 10, suffix: '\$');
-
-_selection02 = new ComboBox()
-..width = 120
-..height = 22
-..dataProvider = createDataProvider(dpLen: 10, labelMain: 'rating');  
-    </textarea>
-    
-    
-    
 
     <script type="application/dart" src="dartplay.dart"></script>
     <script src="packages/browser/dart.js"></script>
     <script src="http://igindo.com/dart/shCore.js"></script>
     <script src="http://igindo.com/dart/shBrushJava.js"></script>
     <script language="javascript" src="http://igindo.com/dart/shBrushXml.js"></script>
-<script language="javascript">
-dp.SyntaxHighlighter.ClipboardSwf = 'http://igindo.com/dart/clipboard.swf';
-dp.SyntaxHighlighter.HighlightAll('code');
-</script>
+    <script language="javascript">
+      dp.SyntaxHighlighter.ClipboardSwf = 'http://igindo.com/dart/clipboard.swf';
+      dp.SyntaxHighlighter.HighlightAll('code');
+    </script>
   </body>
 </html>
