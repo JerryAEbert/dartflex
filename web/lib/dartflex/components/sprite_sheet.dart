@@ -101,6 +101,48 @@ class SpriteSheet extends Group {
   }
   
   //---------------------------------
+  // sheetWidth
+  //---------------------------------
+  
+  int _sheetWidth = 0;
+  
+  int get sheetWidth => _sheetWidth;
+  set sheetWidth(int value) {
+    if (value != _sheetWidth) {
+      _sheetWidth = value;
+      
+      dispatch(
+          new FrameworkEvent(
+              'sheetWidthChanged'  
+          )    
+      );
+      
+      later > _updateIndex;
+    }
+  }
+  
+  //---------------------------------
+  // sheetHeight
+  //---------------------------------
+  
+  int _sheetHeight = 0;
+  
+  int get sheetHeight => _sheetHeight;
+  set sheetHeight(int value) {
+    if (value != _sheetHeight) {
+      _sheetHeight = value;
+      
+      dispatch(
+          new FrameworkEvent(
+              'sheetHeightChanged'  
+          )    
+      );
+      
+      later > _updateIndex;
+    }
+  }
+  
+  //---------------------------------
   //
   // Constructor
   //
@@ -136,10 +178,24 @@ class SpriteSheet extends Group {
   }
   
   void _updateIndex() {
-    if (_control != null) {
+    if (
+        (_control != null) &&
+        (_sheetWidth > 0) &&
+        (_sheetHeight > 0) &&
+        (_columnSize > 0) &&
+        (_rowSize > 0)
+    ) {
       final String px = 'px';
-      final int column = _index % _columnSize;
-      final int row = _index ~/ _columnSize;
+      final int colsPerRow = _sheetWidth ~/ _columnSize;
+      final int rows = _sheetHeight ~/ _rowSize;
+      final int maxIndex = rows * colsPerRow;
+      
+      if (index > maxIndex) {
+        throw new RangeError('index $_index out of range $maxIndex');
+      }
+      
+      final int column = _index % colsPerRow;
+      final int row = _index ~/ colsPerRow;
       final int posX = column * _columnSize;
       final int posY = row * _rowSize;
       

@@ -460,6 +460,8 @@ class RatingItemRenderer extends ItemRenderer {
   
   void createChildren() {
     _spriteSheet = new SpriteSheet()
+    ..sheetWidth = 700
+    ..sheetHeight = 25
     ..columnSize = 140
     ..rowSize = 25
     ..source = 'http://www.igindo.com/dart/datagrid/rating.png';
