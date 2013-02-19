@@ -8,17 +8,26 @@ abstract class IItemRenderer implements IUIWrapper {
   String get state;
   set state(String value);
   
-  int get width;
-  set width(int value);
-  
-  int get height;
-  set height(int value);
-  
   bool get selected;
   set selected(bool value);
   
   Object get data;
   set data(Object value);
+  
+  bool get autoDrawBackground;
+  set autoDrawBackground(bool value);
+  
+  double get opacity;
+  set opacity(double value);
+  
+  int get gap;
+  set gap(int value);
+  
+  String get interactionStyle;
+  
+  void setOpacityDimmed();
+  
+  void setOpacityNormal();
   
   void createChildren();
   
@@ -136,6 +145,21 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   }
   
   //---------------------------------
+  // opacity
+  //---------------------------------
+  
+  double _opacity = 1.0;
+  
+  double get opacity => _opacity;
+  set opacity(double value) {
+    if (value != _opacity) {
+      _opacity = value;
+      
+      _updateOpacity();
+    }
+  }
+  
+  //---------------------------------
   // gap
   //---------------------------------
   
@@ -182,11 +206,27 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   void updateAfterInteraction() {
   }
   
+  void setOpacityDimmed() {
+    opacity = .25;
+  }
+  
+  void setOpacityNormal() {
+    opacity = 1.0;
+  }
+  
   //---------------------------------
   //
   // Protected methods
   //
   //---------------------------------
+  
+  void _setControl(Element element) {
+    super._setControl(element);
+    
+    //_control.style.transition = 'opacity .5s';
+    
+    _updateOpacity();
+  }
   
   void _createChildren() {
     super._createChildren();
@@ -216,6 +256,12 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
     }
     
     updateLayout();
+  }
+  
+  void _updateOpacity() {
+    if (_control != null) {
+      _control.style.opacity = _opacity.toString();
+    }
   }
   
   double _fraction;
