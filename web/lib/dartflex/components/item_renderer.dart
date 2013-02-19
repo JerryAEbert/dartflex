@@ -70,7 +70,7 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
     if (value != _data) {
       _data = value;
       
-      later > _invalidateData;
+      _invalidateData();
     }
   }
   
@@ -107,7 +107,7 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   }
   
   //---------------------------------
-  // selected
+  // interactionStyle
   //---------------------------------
   
   String get interactionStyle {

@@ -430,7 +430,7 @@ class RatingItemRenderer extends ItemRenderer {
   //
   //---------------------------------
   
-  Image _image;
+  SpriteSheet _spriteSheet;
   
   //---------------------------------
   //
@@ -459,28 +459,20 @@ class RatingItemRenderer extends ItemRenderer {
   //---------------------------------
   
   void createChildren() {
-    _image = new Image()
-    ..width = 140
-    ..height = 25
-    ..paddingLeft = 10;
+    _spriteSheet = new SpriteSheet()
+    ..columnSize = 140
+    ..rowSize = 25
+    ..source = 'http://www.igindo.com/dart/datagrid/rating.png';
     
-    if (data != null) {
-      int rating = data['rating'];
-      
-      _image.source = 'http://www.igindo.com/orgchart/assets/rndImg/star$rating.png';
-    }
-    
-    add(_image);
+    add(_spriteSheet);
   }
   
   void invalidateData() {
     if (
-        (_image != null) &&
-        (data != null)
+        (data != null) && 
+        (_spriteSheet != null)
     ) {
-      int rating = data['rating'];
-      
-      _image.source = 'http://www.igindo.com/orgchart/assets/rndImg/star$rating.png';
+      _spriteSheet.index = data['rating'];
     }
   }
 }

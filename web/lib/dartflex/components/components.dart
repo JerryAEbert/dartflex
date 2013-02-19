@@ -24,5 +24,6 @@ part "item_renderer.dart";
 part "list_renderer.dart";
 part "list_wrapper.dart";
 part "rich_text.dart";
+part "sprite_sheet.dart";
 part "ui_wrapper.dart";
 part "vgroup.dart";

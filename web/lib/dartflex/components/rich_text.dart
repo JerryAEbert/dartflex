@@ -90,9 +90,7 @@ class RichText extends UIWrapper {
   
   void _commitText() {
     if (_control != null) {
-      SpanElement element = _control as SpanElement;
-      
-      element.text = _text;
+      _control.innerHtml = (_text != null) ? _text : '';
     }
   }
 }

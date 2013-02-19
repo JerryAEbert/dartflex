@@ -6,6 +6,11 @@ class ListRenderer extends ListWrapper {
   
   Group _scrollTarget;
   
+  bool _allowDataUpdate = true;
+  bool _isIdleActive = false;
+  int _lastScrollPosition = 0;
+  int _idleTicks = 0;
+  
   //---------------------------------
   //
   // Public properties
@@ -284,37 +289,7 @@ class ListRenderer extends ListWrapper {
     
     container.onScroll.listen(_container_scrollHandler);
     
-    container.document.onMouseDown.listen(
-      (Event event) => _triggerIdle()
-    );
-    
     super._createChildren();
-  }
-  
-  bool _isMouseDownTriggered = false;
-  
-  void _triggerIdle() {
-    _isMouseDownTriggered = true;
-    
-    idleTimeout().then(
-        (_) {
-          _isMouseDownTriggered = false;
-          
-          _updateAfterScrollPositionChanged(true);
-        }
-    );
-  }
-  
-  Future idleTimeout() {
-    final completer = new Completer();  
-    
-    void runAfterTimeout(_) {  
-      completer.complete();  
-    }  
-    
-    new Timer(300, runAfterTimeout);  
-    
-    return completer.future;  
   }
   
   void _removeAllElements() {
@@ -567,7 +542,7 @@ class ListRenderer extends ListWrapper {
         data = null;
       }
       
-      if (!_isMouseDownTriggered) {
+      if (_allowDataUpdate) {
         renderer.data = ((_labelFunction != null) && (data != null)) ? _labelFunction(data) : data;
       }
     }
@@ -606,12 +581,31 @@ class ListRenderer extends ListWrapper {
     selectedItem = newSelectedItem;
   }
   
+  Future _waitForIdle() {
+    final completer = new Completer();
+    
+    _isIdleActive = true;
+    _idleTicks++;
+    
+    new Timer(50, (_) => completer.complete());  
+    
+    return completer.future;  
+  }
+  
   void _container_scrollHandler(Event event) {
-    if (!_isMouseDownTriggered) {
-      _triggerIdle();
-    }
+    _allowDataUpdate = false;
     
     scrollPosition = (_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft;
+    
+    if (!_isIdleActive) {
+      _lastScrollPosition = _scrollPosition;
+      
+      _waitForIdle().then(
+        (_) {
+          _updateAfterScrollIdle();
+        }
+      );
+    }
     
     dispatch(
       new FrameworkEvent(
@@ -619,6 +613,32 @@ class ListRenderer extends ListWrapper {
         relatedObject: _control
       )    
     );
+  }
+  
+  void _updateAfterScrollIdle() {
+    int pos = (_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft;
+    
+    _isIdleActive = false;
+    
+    if (
+        (_lastScrollPosition == pos) ||
+        (_idleTicks == 10)
+    ) {
+      _allowDataUpdate = true;
+      _idleTicks = 0;
+      
+      _updateVisibleItemRenderers();
+    } else {
+      _lastScrollPosition = pos;
+      
+      _allowDataUpdate = false;
+      
+      _waitForIdle().then(
+          (_) {
+            _updateAfterScrollIdle();
+          }
+      );
+    }
   }
   
   void _itemRenderer_controlChangedHandler(FrameworkEvent event) {
