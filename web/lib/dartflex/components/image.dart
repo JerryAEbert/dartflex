@@ -25,7 +25,7 @@ class Image extends UIWrapper {
           new FrameworkEvent('sourceChanged') 
       );
       
-      invalidateProperties();
+      _commitSource();
     }
   }
   
@@ -58,13 +58,13 @@ class Image extends UIWrapper {
   
   void _createChildren() {
     if (_control == null) {
-      ImageElement controlCast = new ImageElement();
+      DivElement controlCast = new DivElement();
       
       controlCast.onLoad.listen(_control_loadHandler);
       
-      controlCast.src = _source;
-      
-      _reflowManager.invalidateCSS(_control, 'overflow', 'hidden');
+      _reflowManager.invalidateCSS(controlCast, 'overflow', 'hidden');
+      _reflowManager.invalidateCSS(controlCast, 'background-repeat', 'no-repeat');
+      _reflowManager.invalidateCSS(controlCast, 'background-image', 'url($_source)');
       
       _setControl(controlCast);
     }
@@ -72,16 +72,16 @@ class Image extends UIWrapper {
     super._createChildren();
   }
   
-  void _commitProperties() {
+  void _commitSource() {
     super._commitProperties();
     
     if (_control != null) {
-      ImageElement controlCast = _control as ImageElement;
+      DivElement controlCast = _control as DivElement;
       
       if (_isSourceChanged) {
         _isSourceChanged = false;
         
-        controlCast.src = _source;
+        _reflowManager.invalidateCSS(controlCast, 'background-image', 'url($_source)');
       }
     }
   }

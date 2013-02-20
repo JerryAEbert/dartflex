@@ -259,7 +259,7 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   
   void _updateOpacity() {
     if (_control != null) {
-      _reflowManager.invalidateCSS(_control, 'opacity', _opacity.toString());
+      //_reflowManager.invalidateCSS(_control, 'opacity', _opacity.toString());
     }
   }
   

@@ -9,7 +9,16 @@ class ReflowManager {
   //---------------------------------
   
   List<ElementCSSMap> _elements = new List<ElementCSSMap>();
+  
   Future _currentNextInterval;
+  
+  Future get currentNextInterval {
+    if (_currentNextInterval == null) {
+      _currentNextInterval = awaitNextInterval();
+    }
+    
+    return _currentNextInterval;
+  }
   
   //---------------------------------
   //
@@ -75,7 +84,7 @@ class ReflowManager {
             RegExp pattern = new RegExp('\\s*${property}:[^;]+;');
             
             if (cssText.contains(pattern)) {
-              cssText = cssText.replaceFirst(pattern, ' ${property}: ${value};');
+              cssText = cssText.replaceAll(pattern, ' ${property}: ${value};');
             } else {
               cssText = cssText.concat(' ${property}: ${value};');
             }
@@ -92,13 +101,13 @@ class ReflowManager {
   }
   
   Future awaitNextInterval() {
-    final completer = new Completer();  
+    final completer = new Completer();
     
-    void runAfterTimeout(_) {  
-      completer.complete();  
-    }  
-    
-    new Timer(30, runAfterTimeout);  
+    window.setImmediate(
+      () {
+        completer.complete();
+      }    
+    );
     
     return completer.future;  
   }

@@ -110,9 +110,6 @@ class Group extends UIWrapper {
   }
   
   void _updateScrollPolicy() {
-    // TO_FIX
-    _reflowManager.invalidateCSS(_control, 'overflow', 'visible');
-    
     if (_horizontalScrollPolicy == ScrollPolicy.NONE) {
       _reflowManager.invalidateCSS(_control, 'overflow-x', 'hidden');
     } else if (_horizontalScrollPolicy == ScrollPolicy.AUTO) {

@@ -6,11 +6,6 @@ class ListRenderer extends ListWrapper {
   
   Group _scrollTarget;
   
-  bool _allowDataUpdate = true;
-  bool _isIdleActive = false;
-  int _lastScrollPosition = 0;
-  int _idleTicks = 0;
-  
   //---------------------------------
   //
   // Public properties
@@ -543,18 +538,8 @@ class ListRenderer extends ListWrapper {
         data = null;
       }
       
-      actualData = ((_labelFunction != null) && (data != null)) ? _labelFunction(data) : data;
-      
-      if (_allowDataUpdate) {
-        renderer.data = actualData;
-      }
+      renderer.data = ((_labelFunction != null) && (data != null)) ? _labelFunction(data) : data;
     }
-  }
-  
-  void _updateAllItemRendererOpacities() {
-    _itemRenderers.forEach(
-        (IItemRenderer renderer) => _allowDataUpdate ? renderer.setOpacityNormal() : renderer.setOpacityDimmed()
-    );
   }
   
   void _handleMouseInteraction(Event event) {
@@ -590,32 +575,8 @@ class ListRenderer extends ListWrapper {
     selectedItem = newSelectedItem;
   }
   
-  Future _waitForIdle() {
-    final completer = new Completer();
-    
-    _isIdleActive = true;
-    _idleTicks++;
-    
-    new Timer(100, (_) => completer.complete());  
-    
-    return completer.future;  
-  }
-  
   void _container_scrollHandler(Event event) {
-    _allowDataUpdate = false;
-    
     scrollPosition = (_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft;
-    
-    if (!_isIdleActive) {
-      _isIdleActive = true;
-      _lastScrollPosition = _scrollPosition;
-      
-      _waitForIdle().then(
-        (_) {
-          _updateAfterScrollIdle();
-        }
-      );
-    }
     
     dispatch(
       new FrameworkEvent(
@@ -623,45 +584,6 @@ class ListRenderer extends ListWrapper {
         relatedObject: _control
       )    
     );
-  }
-  
-  void _updateAfterScrollIdle() {
-    if (_allowDataUpdate) {
-      return;
-    }
-    
-    int pos = (_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft;
-    bool isScrollComplete = (_lastScrollPosition == pos);
-    
-    if (
-        isScrollComplete ||
-        (_idleTicks == 1)
-    ) {
-      _allowDataUpdate = true;
-      _idleTicks = 0;
-      
-      _updateVisibleItemRenderers();
-      
-      _allowDataUpdate = isScrollComplete;
-      
-      if (isScrollComplete) {
-        _isIdleActive = false;
-        
-        _updateAllItemRendererOpacities();
-        
-        return;
-      }
-    }
-    
-    _lastScrollPosition = pos;
-    
-    _waitForIdle().then(
-        (_) {
-          _updateAfterScrollIdle();
-        }
-      );
-    
-    _updateAllItemRendererOpacities();
   }
   
   void _itemRenderer_controlChangedHandler(FrameworkEvent event) {

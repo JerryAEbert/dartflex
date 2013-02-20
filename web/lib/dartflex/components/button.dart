@@ -25,7 +25,7 @@ class Button extends UIWrapper {
         )    
       );
       
-      later > _commitLabel;
+      _commitLabel();
     }
   }
   
@@ -72,7 +72,11 @@ class Button extends UIWrapper {
     if (_control != null) {
       ButtonElement element = _control as ButtonElement;
       
-      element.text = _label;
+      _reflowManager.currentNextInterval.then(
+          (_) {
+            element.text = _label;
+          }
+      );
     } else {
       later > _commitLabel;
     }

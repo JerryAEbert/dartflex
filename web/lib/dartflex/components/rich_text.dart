@@ -25,7 +25,7 @@ class RichText extends UIWrapper {
         )    
       );
       
-      later > _commitText;
+      _commitText();
     }
   }
   
@@ -46,7 +46,7 @@ class RichText extends UIWrapper {
         )    
       );
       
-      later > _commitTextAlign;
+      _commitTextAlign();
     }
   }
   
@@ -74,7 +74,7 @@ class RichText extends UIWrapper {
   void _createChildren() {
     super._createChildren();
     
-    _setControl(new SpanElement());
+    _setControl(new LabelElement());
     
     _commitTextAlign();
     _commitText();
@@ -90,7 +90,11 @@ class RichText extends UIWrapper {
   
   void _commitText() {
     if (_control != null) {
-      _control.innerHtml = (_text != null) ? _text : '';
+      _reflowManager.currentNextInterval.then(
+          (_) {
+            _control.innerHtml = (_text != null) ? _text : '';
+          }
+      ); 
     }
   }
 }

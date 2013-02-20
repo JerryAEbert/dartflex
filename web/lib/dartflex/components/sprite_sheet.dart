@@ -31,7 +31,7 @@ class SpriteSheet extends Group {
         )    
       );
       
-      later > _updateSource;
+      _updateIndex();
     }
   }
   
@@ -52,7 +52,7 @@ class SpriteSheet extends Group {
           )    
       );
       
-      later > _updateIndex;
+      _updateIndex();
     }
   }
   
@@ -74,7 +74,7 @@ class SpriteSheet extends Group {
           )    
       );
       
-      later > _updateIndex;
+      _updateIndex();
     }
   }
   
@@ -96,7 +96,7 @@ class SpriteSheet extends Group {
           )    
       );
       
-      later > _updateIndex;
+      _updateIndex();
     }
   }
   
@@ -117,7 +117,7 @@ class SpriteSheet extends Group {
           )    
       );
       
-      later > _updateIndex;
+      _updateIndex();
     }
   }
   
@@ -138,7 +138,7 @@ class SpriteSheet extends Group {
           )    
       );
       
-      later > _updateIndex;
+      _updateIndex();
     }
   }
   
