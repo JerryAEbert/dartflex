@@ -64,7 +64,7 @@ class Image extends UIWrapper {
       
       controlCast.src = _source;
       
-      controlCast.style.overflow = 'hidden';
+      _reflowManager.invalidateCSS(_control, 'overflow', 'hidden');
       
       _setControl(controlCast);
     }

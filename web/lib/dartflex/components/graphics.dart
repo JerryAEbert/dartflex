@@ -45,9 +45,9 @@ class Graphics extends UIWrapper {
     
     _setControl(controlCast);
     
-    controlCast.style.position = 'absolute';
-    controlCast.style.left = '0px';
-    controlCast.style.top = '0px';
+    _reflowManager.invalidateCSS(controlCast, 'position', 'absolute');
+    _reflowManager.invalidateCSS(controlCast, 'left', '0px');
+    _reflowManager.invalidateCSS(controlCast, 'top', '0px');
     
     _context = controlCast.getContext("2d");
   }

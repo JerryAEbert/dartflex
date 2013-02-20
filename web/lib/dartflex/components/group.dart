@@ -111,22 +111,22 @@ class Group extends UIWrapper {
   
   void _updateScrollPolicy() {
     // TO_FIX
-    _control.style.overflow = 'visible';
+    _reflowManager.invalidateCSS(_control, 'overflow', 'visible');
     
     if (_horizontalScrollPolicy == ScrollPolicy.NONE) {
-      _control.style.overflowX = 'hidden';
+      _reflowManager.invalidateCSS(_control, 'overflow-x', 'hidden');
     } else if (_horizontalScrollPolicy == ScrollPolicy.AUTO) {
-      _control.style.overflowX = 'auto';
+      _reflowManager.invalidateCSS(_control, 'overflow-x', 'auto');
     } else {
-      _control.style.overflowX = 'scroll';
+      _reflowManager.invalidateCSS(_control, 'overflow-x', 'scroll');
     }
     
     if (_verticalScrollPolicy == ScrollPolicy.NONE) {
-      _control.style.overflowY = 'hidden';
+      _reflowManager.invalidateCSS(_control, 'overflow-y', 'hidden');
     } else if (_verticalScrollPolicy == ScrollPolicy.AUTO) {
-      _control.style.overflowY = 'auto';
+      _reflowManager.invalidateCSS(_control, 'overflow-y', 'auto');
     } else {
-      _control.style.overflowY = 'scroll';
+      _reflowManager.invalidateCSS(_control, 'overflow-y', 'scroll');
     }
   }
 }

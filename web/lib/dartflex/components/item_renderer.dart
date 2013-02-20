@@ -235,9 +235,8 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
     
     _setControl(container);
     
-    _control.style.overflow = 'hidden';
-    
-    container.style.border = '1px solid #cccccc';
+    _reflowManager.invalidateCSS(_control, 'overflow', 'hidden');
+    _reflowManager.invalidateCSS(container, 'border', '1px solid #cccccc');
     
     createChildren();
     
@@ -260,7 +259,7 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   
   void _updateOpacity() {
     if (_control != null) {
-      _control.style.opacity = _opacity.toString();
+      _reflowManager.invalidateCSS(_control, 'opacity', _opacity.toString());
     }
   }
   

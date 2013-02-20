@@ -79,12 +79,12 @@ class RichText extends UIWrapper {
     _commitTextAlign();
     _commitText();
     
-    _control.style.overflow = 'hidden';
+    _reflowManager.invalidateCSS(_control, 'overflow', 'hidden');
   }
   
   void _commitTextAlign() {
     if (_control != null) {
-      _control.style.textAlign = _align;
+      _reflowManager.invalidateCSS(_control, 'textAlign', '_align');
     }
   }
   

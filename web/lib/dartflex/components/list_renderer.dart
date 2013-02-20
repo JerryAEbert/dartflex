@@ -285,7 +285,8 @@ class ListRenderer extends ListWrapper {
     
     _setControl(container);
     
-    container.style.cssText = 'border: 1px solid rgb(128, 128, 128); background-color: rgb(255, 255, 255);';
+    _reflowManager.invalidateCSS(container, 'border', '1px solid rgb(128, 128, 128)');
+    _reflowManager.invalidateCSS(container, 'background-color', 'rgb(255, 255, 255)');
     
     container.onScroll.listen(_container_scrollHandler);
     
@@ -634,7 +635,7 @@ class ListRenderer extends ListWrapper {
     
     if (
         isScrollComplete ||
-        (_idleTicks == 3)
+        (_idleTicks == 1)
     ) {
       _allowDataUpdate = true;
       _idleTicks = 0;

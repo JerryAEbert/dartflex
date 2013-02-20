@@ -190,8 +190,8 @@ class DataGrid extends ListWrapper {
     
     _setControl(container);
     
-    container.style.border = '1px solid #808080';
-    container.style.backgroundColor = '#cccccc';
+    _reflowManager.invalidateCSS(container, 'border', '1px solid #808080');
+    _reflowManager.invalidateCSS(container, 'background-color', '#cccccc');
     
     _list.addEventListener(
       'rendererAdded',
