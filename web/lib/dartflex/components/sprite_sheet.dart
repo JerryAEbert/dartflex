@@ -167,13 +167,13 @@ class SpriteSheet extends Group {
     super._createChildren();
     
     if (_source != null) {
-      _reflowManager.invalidateCSS(_control, 'background-image', 'url($_source)');
+      _reflowManager.invalidateCSS(_control, 'backgroundImage', 'url($_source)');
     }
   }
   
   void _updateSource() {
     if (_control != null) {
-      _reflowManager.invalidateCSS(_control, 'background-image', 'url($_source)');
+      _reflowManager.invalidateCSS(_control, 'backgroundImage', 'url($_source)');
     }
   }
   
@@ -199,7 +199,7 @@ class SpriteSheet extends Group {
       final int posX = column * _columnSize;
       final int posY = row * _rowSize;
       
-      _reflowManager.invalidateCSS(_control, 'background-position', '$posX$px $posY$px');
+      _reflowManager.invalidateCSS(_control, 'backgroundPosition', '$posX$px $posY$px');
     }
   }
 }

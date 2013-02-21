@@ -63,8 +63,8 @@ class Image extends UIWrapper {
       controlCast.onLoad.listen(_control_loadHandler);
       
       _reflowManager.invalidateCSS(controlCast, 'overflow', 'hidden');
-      _reflowManager.invalidateCSS(controlCast, 'background-repeat', 'no-repeat');
-      _reflowManager.invalidateCSS(controlCast, 'background-image', 'url($_source)');
+      _reflowManager.invalidateCSS(controlCast, 'backgroundRepeat', 'no-repeat');
+      _reflowManager.invalidateCSS(controlCast, 'backgroundImage', 'url($_source)');
       
       _setControl(controlCast);
     }
@@ -81,7 +81,7 @@ class Image extends UIWrapper {
       if (_isSourceChanged) {
         _isSourceChanged = false;
         
-        _reflowManager.invalidateCSS(controlCast, 'background-image', 'url($_source)');
+        _reflowManager.invalidateCSS(controlCast, 'backgroundImage', 'url($_source)');
       }
     }
   }

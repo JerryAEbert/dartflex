@@ -188,18 +188,27 @@ class UIWrapper implements IUIWrapper {
   //---------------------------------
   
   int _x = 0;
+  int _xTranslate = 0;
   
   int get x => _x;
   
   set x(int value) {
     if (value != _x) {
       _x = value;
+      _xTranslate = value - _x;
       
       dispatch(
         new FrameworkEvent('xChanged') 
       );
       
-      _updateControl(1);
+      //_updateControl(1);
+      /*if (_control != null) {
+        try {
+          _control.translate(_xTranslate, _yTranslate);
+        } on Error catch (e) {
+          */_updateControl(1);/*
+        }
+      }*/
     }
   }
   
@@ -208,18 +217,27 @@ class UIWrapper implements IUIWrapper {
   //---------------------------------
   
   int _y = 0;
+  int _yTranslate = 0;
   
   int get y => _y;
   
   set y(int value) {
     if (value != _y) {
+      _yTranslate = value - _y;
       _y = value;
       
       dispatch(
         new FrameworkEvent('yChanged') 
       );
       
-      _updateControl(2);
+      //_updateControl(2);
+      /*if (_control != null) {
+        try {
+          _control.translate(_xTranslate, _yTranslate);
+        } on Error catch (e) {
+          */_updateControl(2);/*
+        }
+      }*/
     }
   }
   
@@ -609,15 +627,15 @@ class UIWrapper implements IUIWrapper {
       if (_elementId == null) {
         
         switch (type) {
-          case 1 : _reflowManager.invalidateCSS(_control, 'left', '$_x$px'); break;
-          case 2 : _reflowManager.invalidateCSS(_control, 'top', '$_y$px'); break;
-          case 3 : _reflowManager.invalidateCSS(_control, 'width', '$_width$px'); break;
-          case 4 : _reflowManager.invalidateCSS(_control, 'height', '$_height$px'); break;
+          case 1 : _reflowManager.invalidateCSS(_control, 'left', '${_x}px'); break;
+          case 2 : _reflowManager.invalidateCSS(_control, 'top', '${_y}px'); break;
+          case 3 : _reflowManager.invalidateCSS(_control, 'width', '${_width}px'); break;
+          case 4 : _reflowManager.invalidateCSS(_control, 'height', '${_height}px'); break;
           case 5 : 
-            _reflowManager.invalidateCSS(_control, 'left', '$_x$px');
-            _reflowManager.invalidateCSS(_control, 'top', '$_y$px');
-            _reflowManager.invalidateCSS(_control, 'width', '$_width$px');
-            _reflowManager.invalidateCSS(_control, 'height', '$_height$px');
+            _reflowManager.invalidateCSS(_control, 'left', '${_x}px');
+            _reflowManager.invalidateCSS(_control, 'top', '${_y}px');
+            _reflowManager.invalidateCSS(_control, 'width', '${_width}px');
+            _reflowManager.invalidateCSS(_control, 'height', '${_height}px');
             
             break;
         }
@@ -631,10 +649,9 @@ class UIWrapper implements IUIWrapper {
   void _wrapDOMTarget() {
     if (_elementId != null) {
       _control = query(_elementId);
-      _reflowManager = new ReflowManager();
+      _reflowManager = UpdateManager.reflowManager;
       
-      //_control.$dom_addEventListener('resize', _invalidateSize, true);
-      _control.document.window.$dom_addEventListener('resize', _invalidateSize, true);
+      window.$dom_addEventListener('resize', _invalidateSize, true);
       
       later > _updateSize;
     }

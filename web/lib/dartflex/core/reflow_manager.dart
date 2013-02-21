@@ -75,23 +75,38 @@ class ReflowManager {
   }
   
   void _commitAllPendingCSSProperties() {
+    final HtmlElement stubElement = new HtmlElement();
+    final RegExp pattern = new RegExp('[A-Z]');
+    Iterable patternMatches;
+    String pm, pmA, pmB;
+    
     _elements.forEach(
       (ElementCSSMap elementCSSMap) {
-        String cssText = elementCSSMap.element.style.cssText;
+        stubElement.style.cssText = elementCSSMap.element.style.cssText;
         
         elementCSSMap.cssDecl.forEach(
-          (String property, String value) {
-            RegExp pattern = new RegExp('\\s*${property}:[^;]+;');
+          (String propertyName, String value) {
+            patternMatches = pattern.allMatches(propertyName);
             
-            if (cssText.contains(pattern)) {
-              cssText = cssText.replaceAll(pattern, ' ${property}: ${value};');
-            } else {
-              cssText = cssText.concat(' ${property}: ${value};');
-            }
+            patternMatches.forEach(
+              (Match patternMatch) {
+                pm = patternMatch.str.substring(patternMatch.start, patternMatch.end).toLowerCase();
+                pmA = patternMatch.str.substring(0, patternMatch.start);
+                pmB = patternMatch.str.substring(patternMatch.end);
+                
+                propertyName = '${pmA}-$pm$pmB';
+              }
+            );
+            
+            stubElement.style.setProperty(propertyName, value, '');
+            /*stubElement.style.setProperty('-moz-$propertyName', value, '');
+            stubElement.style.setProperty('-ms-$propertyName', value, '');
+            stubElement.style.setProperty('-o-$propertyName', value, '');
+            stubElement.style.setProperty('-webkit-$propertyName', value, '');*/
           }
         );
         
-        elementCSSMap.element.style.cssText = cssText;
+        elementCSSMap.element.style.cssText = stubElement.style.cssText;
       }
     );
     

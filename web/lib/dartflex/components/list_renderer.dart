@@ -281,7 +281,7 @@ class ListRenderer extends ListWrapper {
     _setControl(container);
     
     _reflowManager.invalidateCSS(container, 'border', '1px solid rgb(128, 128, 128)');
-    _reflowManager.invalidateCSS(container, 'background-color', 'rgb(255, 255, 255)');
+    _reflowManager.invalidateCSS(container, 'backgroundColor', 'rgb(255, 255, 255)');
     
     container.onScroll.listen(_container_scrollHandler);
     

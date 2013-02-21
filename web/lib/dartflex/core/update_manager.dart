@@ -11,6 +11,8 @@ class UpdateManager {
   Map _pendingHandlers = new Map();
   List<Function> _pendingHandlersJS = new List<Function>();
   
+  static ReflowManager reflowManager = new ReflowManager();
+  
   //---------------------------------
   //
   // Constructor
@@ -34,14 +36,14 @@ class UpdateManager {
       i = _pendingHandlersJS.length;
       
       while (i > 0) {
-        if (_pendingHandlersJS[--i] == handler) {print('has');
+        if (_pendingHandlersJS[--i] == handler) {
           return;
         }
       }
       
       _pendingHandlersJS.addLast(handler);
       
-      waitForTick().then(
+      reflowManager.currentNextInterval.then(
           (_) {
             i = _pendingHandlersJS.length;
             
@@ -66,7 +68,7 @@ class UpdateManager {
       
       _pendingHandlers[fncToString] = true;
       
-      waitForTick().then(
+      reflowManager.currentNextInterval.then(
           (_) {
             _pendingHandlers.remove(fncToString);
             
@@ -74,17 +76,5 @@ class UpdateManager {
           }
       );
     }
-  }
-  
-  Future waitForTick() {
-    final completer = new Completer();  
-    
-    void runAfterTimeout(_) {  
-      completer.complete();  
-    }  
-    
-    new Timer(30, runAfterTimeout);  
-    
-    return completer.future;  
   }
 }
