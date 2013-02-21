@@ -21,7 +21,7 @@ class ListRenderer extends ListWrapper {
       super.width = value;
       
       if (_dataProvider != null) {
-        _updateAfterScrollPositionChanged(false);
+        _updateAfterScrollPositionChanged();
       }
     }
   }
@@ -35,7 +35,7 @@ class ListRenderer extends ListWrapper {
       super.height = value;
       
       if (_dataProvider != null) {
-        _updateAfterScrollPositionChanged(false);
+        _updateAfterScrollPositionChanged();
       }
     }
   }
@@ -101,7 +101,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      _updateAfterScrollPositionChanged(false);
+      _updateAfterScrollPositionChanged();
     }
   }
   
@@ -122,7 +122,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      _updateAfterScrollPositionChanged(false);
+      _updateAfterScrollPositionChanged();
     }
   }
   
@@ -143,7 +143,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      _updateAfterScrollPositionChanged(false);
+      _updateAfterScrollPositionChanged();
     }
   }
   
@@ -164,7 +164,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      _updateAfterScrollPositionChanged(false);
+      _updateAfterScrollPositionChanged();
     }
   }
   
@@ -185,7 +185,7 @@ class ListRenderer extends ListWrapper {
         )    
       );
       
-      _updateAfterScrollPositionChanged(true);
+      _updateAfterScrollPositionChanged();
     }
   }
   
@@ -429,23 +429,31 @@ class ListRenderer extends ListWrapper {
       int i;
       
       for (i=len; i<0; i++) {
-        remove(_itemRenderers.last);
+        remove(_itemRenderers.removeLast());
       }
       
       for (i=0; i<len; i++) {
         _createElement(null, i);
       }
       
-      if (isVerticalLayout) {
-        _scrollTarget.width = _width;
-        _scrollTarget.height = _dataProvider.length * _rowHeight;
-      } else {
-        _scrollTarget.width = _dataProvider.length * _colWidth;
-        _scrollTarget.height = _height;
+      if (_scrollTarget != null) {
+        if (isVerticalLayout) {
+          _scrollTarget.width = _width;
+          
+          if (_rowHeight > 0) {
+            _scrollTarget.height = _dataProvider.length * _rowHeight;
+          }
+        } else {
+          if (_colWidth > 0) {
+            _scrollTarget.width = _dataProvider.length * _colWidth;
+          }
+          
+          _scrollTarget.height = _height;
+        }
       }
       
       if (len > 0) {
-        _updateAfterScrollPositionChanged(false);
+        _updateAfterScrollPositionChanged();
         
         return true;
       }
@@ -454,7 +462,7 @@ class ListRenderer extends ListWrapper {
     return false;
   }
   
-  void _updateAfterScrollPositionChanged(bool isImmediateUpdate) {
+  void _updateAfterScrollPositionChanged() {
     if (
         (_dataProvider != null) &&
         !_updateElements()
@@ -462,11 +470,7 @@ class ListRenderer extends ListWrapper {
       _updateVisibleItemRenderers();
     }
     
-    if (isImmediateUpdate) {
-      _updateLayout();
-    } else {
-      later > _updateLayout;
-    }
+    _updateLayout();
   }
   
   void _updateVisibleItemRenderers() {

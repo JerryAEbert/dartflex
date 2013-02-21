@@ -1,7 +1,7 @@
 part of dartflex.core;
 
 class FunctionEqualityUtil {
-  
+
   static bool equals(Function functionA, Function functionB) {
     if (!identical(1, 1.0)) {
       // dart VM does not currently support function equality checks
@@ -11,6 +11,6 @@ class FunctionEqualityUtil {
       return (functionA == functionB);
     }
   }
-  
+
 }
 

@@ -1,38 +1,40 @@
 part of dartflex.events;
 
 abstract class IFrameworkEventDispatcher {
-  
+
   //-----------------------------------
   //
   // Public methods
   //
   //-----------------------------------
-  
+
   bool hasEventListener(String type, Function eventHandler);
   void addEventListener(String type, Function eventHandler);
   void removeEventListener(String type, Function eventHandler);
   void dispatch(FrameworkEvent event);
-  
+
 }
 
 class FrameworkEventDispatcher implements IFrameworkEventDispatcher {
-  
+
   //-----------------------------------
   //
   // Private properties
   //
   //-----------------------------------
   
+  static ReflowManager _reflowManager = new ReflowManager();
+
   IFrameworkEventDispatcher _dispatcher;
-  
+
   List<FrameworkEventListenerValuePair> _listenerValuePairs = new List<FrameworkEventListenerValuePair>();
-  
+
   //-----------------------------------
   //
   // Constructor
   //
   //-----------------------------------
-  
+
   FrameworkEventDispatcher({IFrameworkEventDispatcher dispatcher: null}) {
     if (dispatcher == null) {
       _dispatcher = this;
@@ -40,24 +42,24 @@ class FrameworkEventDispatcher implements IFrameworkEventDispatcher {
       _dispatcher = dispatcher;
     }
   }
-  
+
   //-----------------------------------
   //
   // Public methods
   //
   //-----------------------------------
-  
+
   bool hasEventListener(String type, Function eventHandler) {
     if (eventHandler.toString() == 'Closure: (dynamic, FrameworkEvent) => dynamic') {
       return false;
     }
-    
+
     FrameworkEventListenerValuePair valuePair;
     int i = _listenerValuePairs.length;
-    
+
     while (i > 0) {
       valuePair = _listenerValuePairs[--i];
-      
+
       if (
           (valuePair.type == type) &&
           FunctionEqualityUtil.equals(valuePair.eventHandler, eventHandler)
@@ -65,10 +67,10 @@ class FrameworkEventDispatcher implements IFrameworkEventDispatcher {
         return true;
       }
     }
-    
+
     return false;
   }
-  
+
   void addEventListener(String type, Function eventHandler) {
     if (!hasEventListener(type, eventHandler)) {
       _listenerValuePairs.add(
@@ -76,14 +78,14 @@ class FrameworkEventDispatcher implements IFrameworkEventDispatcher {
       );
     }
   }
-  
+
   void removeEventListener(String type, Function eventHandler) {
     int i = _listenerValuePairs.length;
     FrameworkEventListenerValuePair valuePair;
-    
+
     while (i > 0) {
       valuePair = _listenerValuePairs[--i];
-      
+
       if (
           (type == valuePair.type) &&
           FunctionEqualityUtil.equals(eventHandler, valuePair.eventHandler)
@@ -92,17 +94,17 @@ class FrameworkEventDispatcher implements IFrameworkEventDispatcher {
       }
     }
   }
-  
+
   void dispatch(FrameworkEvent event) {
     FrameworkEventListenerValuePair valuePair;
     int i = _listenerValuePairs.length;
-    
+
     if (i > 0) {
       event.currentTarget = _dispatcher;
-      
+
       while (i > 0) {
         valuePair = _listenerValuePairs[--i];
-        
+
         if (event.type == valuePair.type) {
           valuePair.eventHandler(event);
         }
@@ -112,39 +114,39 @@ class FrameworkEventDispatcher implements IFrameworkEventDispatcher {
 }
 
 class FrameworkEventListenerValuePair {
-  
+
   //-----------------------------------
   //
   // Public properties
   //
   //-----------------------------------
-  
+
   //-----------------------------------
   // type
   //-----------------------------------
-  
+
   String _type;
-  
+
   String get type => _type;
-  
+
   //-----------------------------------
   // eventHandler
   //-----------------------------------
-  
+
   Function _eventHandler;
-  
+
   Function get eventHandler => _eventHandler;
-  
+
   //-----------------------------------
   //
   // Constructor
   //
   //-----------------------------------
-  
+
   FrameworkEventListenerValuePair(String type, Function eventHandler) {
     _type = type;
     _eventHandler = eventHandler;
   }
-  
+
 }
 
