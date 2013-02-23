@@ -251,7 +251,7 @@ class DataGrid extends ListWrapper {
         ..height = _headerHeight;
 
       _headerContainer.add(header);
-
+      
       for (i=0; i<len; i++) {
         column = _columns[i] as DataGridColumn;
 
@@ -273,13 +273,12 @@ class DataGrid extends ListWrapper {
           (_list != null) &&
           (_list._itemRenderers != null)
       ) {
-        i = _list._itemRenderers.length;
-
-        while (i > 0) {
-          renderer = _list._itemRenderers[--i]
-            ..gap = _columnSpacing
-            ..columns = _columns;
-        }
+        _list._itemRenderers.forEach(
+          (renderer) {
+            renderer.gap = _columnSpacing;
+            renderer.columns = _columns;
+          }    
+        );
       }
     }
   }
@@ -314,7 +313,7 @@ class DataGrid extends ListWrapper {
       int tw = 0;
       int remainingWidth = 0;
       double procCount = .0;
-
+      
       while (i > 0) {
         column = _columns[--i];
 

@@ -109,12 +109,12 @@ class ReflowManager {
           propertyNameCopy = '${pmA}-$pm$pmB';
         }
     );
-
+    
     _detachedElement.style.setProperty(propertyNameCopy, value, '');
-    /*stubElement.style.setProperty('-moz-$propertyName', value, '');
-    stubElement.style.setProperty('-ms-$propertyName', value, '');
-    stubElement.style.setProperty('-o-$propertyName', value, '');
-    stubElement.style.setProperty('-webkit-$propertyName', value, '');*/
+    /*_detachedElement.style.setProperty('-moz-$propertyName', value, '');
+    _detachedElement.style.setProperty('-ms-$propertyName', value, '');
+    _detachedElement.style.setProperty('-o-$propertyName', value, '');
+    _detachedElement.style.setProperty('-webkit-$propertyName', value, '');*/
   }
 
   Future awaitNextInterval() {

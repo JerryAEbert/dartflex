@@ -590,6 +590,10 @@ class ListRenderer extends ListWrapper {
     );
   }
   
+  void _dataProvider_collectionChangedHandler(FrameworkEvent event) {
+    _updateAfterScrollPositionChanged();
+  }
+  
   void _itemRenderer_controlChangedHandler(FrameworkEvent event) {
     final DivElement renderer = event.relatedObject as DivElement;
     

@@ -540,7 +540,7 @@ class UIWrapper implements IUIWrapper {
     } else {
       _children.addLast(element);
       
-      UIWrapper elementCast = element as UIWrapper;
+      final UIWrapper elementCast = element as UIWrapper;
 
       elementCast._reflowManager = _reflowManager;
       elementCast._owner = this;
@@ -551,9 +551,9 @@ class UIWrapper implements IUIWrapper {
 
         newElementList.add(element.control);
         newElementList.addAll(_owner.control.children);
-
+        
         _owner.control.children.removeAll(_owner.control.children);
-
+        
         _owner.control.children.addAll(newElementList);
       } else {
         _reflowManager.currentNextInterval.whenComplete(
@@ -609,8 +609,6 @@ class UIWrapper implements IUIWrapper {
   }
 
   void _updateControl(int type) {
-    final String px = 'px';
-
     if (_control != null) {
       if (_elementId == null) {
 
@@ -687,23 +685,15 @@ class UIWrapper implements IUIWrapper {
         );
       } else {
         IUIWrapper element;
-        int i = _children.length;
-
-        while (i > 0) {
-          element = _children[--i];
-
-          if (
-              !element.includeInLayout &&
-              (element.control.style.position != 'absolute')
-          ) {
-            _reflowManager.invalidateCSS(_control, 'position', 'absolute');
-          }
-
-          element.x = _x;
-          element.y = _y;
-          element.width = _width;
-          element.height = _height;
-        }
+        
+        _children.forEach(
+          (element) {
+            element.x = _x;
+            element.y = _y;
+            element.width = _width;
+            element.height = _height;
+          }    
+        );
       }
     }
   }
