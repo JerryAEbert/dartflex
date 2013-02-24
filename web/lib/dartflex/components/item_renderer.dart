@@ -48,6 +48,8 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   //---------------------------------
 
   Graphics _selectIndicator;
+  
+  bool _isSelectIndicatorRendered = false;
 
   //---------------------------------
   //
@@ -103,13 +105,11 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   //---------------------------------
 
   bool _selected = false;
-  bool _isSelectionInvalid = false;
 
   bool get selected => _selected;
   set selected(bool value) {
     if (value != _selected) {
       _selected = value;
-      _isSelectionInvalid = true;
 
       later > _updateAfterInteraction;
     }
@@ -223,8 +223,6 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   void _setControl(Element element) {
     super._setControl(element);
 
-    //_control.style.transition = 'opacity .5s';
-
     _updateOpacity();
   }
 
@@ -237,6 +235,11 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
 
     _reflowManager.invalidateCSS(_control, 'overflow', 'hidden');
     _reflowManager.invalidateCSS(container, 'border', '1px solid #cccccc');
+    
+    _selectIndicator = new Graphics()
+    ..includeInLayout = false;
+
+    add(_selectIndicator, prepend: true);
 
     createChildren();
 
@@ -250,10 +253,6 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   void _updateLayout() {
     super._updateLayout();
 
-    if (_autoDrawBackground) {
-      later > _updateAfterInteraction;
-    }
-
     updateLayout();
   }
 
@@ -262,8 +261,6 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
       //_reflowManager.invalidateCSS(_control, 'opacity', _opacity.toString());
     }
   }
-
-  double _fraction;
 
   void _updateAfterInteraction() {
     if (!_autoDrawBackground) {
@@ -274,69 +271,46 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
         (_selectIndicator != null) &&
         (_selectIndicator.context != null)
     ) {
+      double targetOpacity;
+      
       if (_selected) {
-        if (_isSelectionInvalid) {
-          _isSelectionInvalid = false;
-          
-          _selectIndicator.x = _x;
-          _selectIndicator.y = _y;
-          _selectIndicator.width = _width;
-          _selectIndicator.height = _height;
-
-          _fraction = .0;
-
-          later > _applySelectionAlpha;
-        }
-      } else if (_state != 'mouseout') {
-        _selectIndicator.x = _x;
-        _selectIndicator.y = _y;
-        _selectIndicator.width = _width;
-        _selectIndicator.height = _height;
+        _reflowManager.invalidateCSS(_selectIndicator._control, 'transition', 'opacity .5s');
+        _reflowManager.invalidateCSS(_selectIndicator._control, '-o-transition', 'opacity .5s');
+        _reflowManager.invalidateCSS(_selectIndicator._control, '-webkit-transition', 'opacity .5s');
+        _reflowManager.invalidateCSS(_selectIndicator._control, '-moz-transition', 'opacity .5s');
         
-        _selectIndicator.context.clearRect(0, 0, _width, _height);
-
-        _selectIndicator.context.beginPath();
-
-        _selectIndicator.context.globalAlpha = .5;
-        _selectIndicator.context.fillStyle = '#80bbee';
-        _selectIndicator.context.fillRect(0, 0, _width, _height);
-
-        _selectIndicator.context.closePath();
+        targetOpacity = 1.0;
+      } else if (_state != 'mouseout') {
+        _reflowManager.invalidateCSS(_selectIndicator._control, 'transition', 'opacity 0s');
+        
+        targetOpacity = 0.5;
       } else {
-        _selectIndicator.context.clearRect(0, 0, _width, _height);
+        _reflowManager.invalidateCSS(_selectIndicator._control, 'transition', 'opacity .5s');
+        
+        targetOpacity = 0.0;
       }
-    } else if (_selectIndicator == null) {
-      _selectIndicator = new Graphics();
-
-      add(_selectIndicator, prepend: true);
+      
+      _drawSelectIndicator();
+      
+      _reflowManager.invalidateCSS(_selectIndicator._control, 'opacity', targetOpacity.toString());
     } else {
       later > _updateAfterInteraction;
     }
 
     updateAfterInteraction();
   }
-
-  void _applySelectionAlpha() {
-    if (_selected) {
-      _fraction += .025;
-
-      IEaser easer = new Sine();
-      double currentFraction = easer.ease((_fraction > 1.0) ? 1.0 : _fraction);
-
-      _selectIndicator.context.clearRect(0, 0, _width, _height);
-
-      _selectIndicator.context.beginPath();
-
-      _selectIndicator.context.globalAlpha = currentFraction;
-      _selectIndicator.context.fillStyle = '#80bbee';
-      _selectIndicator.context.fillRect(0, 0, _width, _height);
-
-      _selectIndicator.context.closePath();
-
-      if (_fraction < 1.0) {
-        later > _applySelectionAlpha;
-      }
-    }
+  
+  void _drawSelectIndicator() {
+    _selectIndicator.x = _x;
+    _selectIndicator.y = _y;
+    _selectIndicator.width = _width;
+    _selectIndicator.height = _height;
+    
+    _selectIndicator.context.clearRect(0, 0, _width, _height);
+    _selectIndicator.context.beginPath();
+    _selectIndicator.context.fillStyle = '#80bbee';
+    _selectIndicator.context.fillRect(0, 0, _width, _height);
+    _selectIndicator.context.closePath();
   }
 }
 

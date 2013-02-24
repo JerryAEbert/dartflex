@@ -5,7 +5,6 @@ import 'dart:core';
 import 'dart:html';
 import 'dart:math';
 import 'dart:mirrors';
-import '../animation/animation.dart';
 import '../collections/collections.dart';
 import '../core/core.dart';
 import '../events/events.dart';

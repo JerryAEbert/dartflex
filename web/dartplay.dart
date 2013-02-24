@@ -1,7 +1,6 @@
 import 'dart:html';
 import 'dart:math';
 import 'dart:uri';
-import 'lib/dartflex/animation/animation.dart';
 import 'lib/dartflex/collections/collections.dart';
 import 'lib/dartflex/components/components.dart';
 import 'lib/dartflex/core/core.dart';
@@ -96,7 +95,7 @@ void dataGridSetup() {
   ..percentHeight = 100.0
   ..rowHeight = 50
   ..dataProvider = createDataProvider(dpLen: 5000, labelMain: 'Employee nr.');*/
-  
+  //window.setImmediate(callback)
   HGroup container01 = new HGroup(elementId: '#target')
   ..width = 600
   ..percentHeight = 100.0
