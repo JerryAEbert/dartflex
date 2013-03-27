@@ -13,6 +13,7 @@ part "components/combo_box.dart";
 part "components/data_grid.dart";
 part "components/data_grid_column.dart";
 part "components/data_grid_item_renderer.dart";
+part "components/editable_text.dart";
 part "components/footer.dart";
 part "components/graphics.dart";
 part "components/group.dart";

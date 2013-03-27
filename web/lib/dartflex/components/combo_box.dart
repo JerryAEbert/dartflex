@@ -50,8 +50,12 @@ class ComboBox extends ListWrapper {
 
   void _updateSelection() {
     SelectElement controlCast = _control as SelectElement;
-
-    controlCast.selectedIndex = _selectedIndex;
+    
+    if (_selectedItem != null) {
+      controlCast.selectedIndex = _dataProvider.getItemIndex(_selectedItem);
+    } else {
+      controlCast.selectedIndex = _selectedIndex;
+    }
   }
 
   void _control_changeHandler(Event event) {

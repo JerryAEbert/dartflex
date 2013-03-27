@@ -11,6 +11,10 @@ html,body {
   height: 100%;
 }
 
+._EditableText {
+  border: 0;  
+}
+
 ._Header {
   color: #ffffff;
   font-weight: bold;

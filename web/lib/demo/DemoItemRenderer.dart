@@ -126,7 +126,7 @@ class ProductItemRenderer extends ItemRenderer {
   //---------------------------------
 
   Image _icon;
-  RichText _label;
+  EditableText _label;
 
   //---------------------------------
   //
@@ -155,9 +155,10 @@ class ProductItemRenderer extends ItemRenderer {
   //---------------------------------
 
   void createChildren() {
-    _label = new RichText()
+    _label = new EditableText()
     ..percentWidth = 100.0
     ..paddingLeft = 3
+    ..paddingRight = 3
     ..text = (data != null) ? data['product'] : '';
 
     add(_label);
@@ -238,7 +239,7 @@ class TagItemRenderer extends ItemRenderer {
   //
   //---------------------------------
 
-  RichText _label;
+  ComboBox _dropdown;
 
   //---------------------------------
   //
@@ -267,17 +268,36 @@ class TagItemRenderer extends ItemRenderer {
   //---------------------------------
 
   void createChildren() {
-    _label = new RichText()
+    ListCollection dataProvider = new ListCollection();
+    
+    dataProvider + 'dairy';
+    dataProvider + 'sweets';
+    dataProvider + 'fruits';
+    dataProvider + 'veggies';
+    dataProvider + 'bread';
+    dataProvider + 'poultry';
+    dataProvider + 'meat';
+    dataProvider + 'fish';
+    dataProvider + 'beverages';
+    dataProvider + 'household';
+    dataProvider + 'multimedia';
+    dataProvider + 'press shop';
+    dataProvider + 'liquors';
+    dataProvider + 'cleaning';
+    
+    _dropdown = new ComboBox()
     ..percentWidth = 100.0
+    ..percentHeight = 100.0
     ..paddingLeft = 3
-    ..text = (data != null) ? data['tag'] : '';
+    ..dataProvider = dataProvider
+    ..selectedItem = data['tag'];
 
-    add(_label);
+    add(_dropdown);
   }
   
   void invalidateData() {
-    if (_label != null) {
-      _label.text = (data != null) ? data['tag'] : '';
+    if (_dropdown != null) {
+      _dropdown.selectedItem = (data != null) ? data['tag'] : '';
     }
   }
 }
