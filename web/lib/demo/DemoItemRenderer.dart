@@ -157,6 +157,7 @@ class ProductItemRenderer extends ItemRenderer {
   void createChildren() {
     _label = new EditableText()
     ..percentWidth = 100.0
+    ..percentHeight = 100.0
     ..paddingLeft = 3
     ..paddingRight = 3
     ..text = (data != null) ? data['product'] : '';
