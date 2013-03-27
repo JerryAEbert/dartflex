@@ -1,4 +1,4 @@
-part of dartflex.events;
+part of dartflex;
 
 class FrameworkEvent {
 

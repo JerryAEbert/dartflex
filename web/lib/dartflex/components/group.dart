@@ -1,4 +1,4 @@
-part of dartflex.components;
+part of dartflex;
 
 class Group extends UIWrapper {
 
@@ -29,7 +29,7 @@ class Group extends UIWrapper {
 
       _isScrollPolicyInvalid = true;
 
-      dispatch(
+      notify(
         new FrameworkEvent(
           "horizontalScrollPolicyChanged"
         )
@@ -52,7 +52,7 @@ class Group extends UIWrapper {
 
       _isScrollPolicyInvalid = true;
 
-      dispatch(
+      notify(
         new FrameworkEvent(
           "verticalScrollPolicyChanged"
         )
@@ -69,6 +69,7 @@ class Group extends UIWrapper {
   //---------------------------------
 
   Group({String elementId: null}) : super(elementId: elementId) {
+  	_className = 'Group';
   }
 
   //---------------------------------
@@ -111,19 +112,19 @@ class Group extends UIWrapper {
 
   void _updateScrollPolicy() {
     if (_horizontalScrollPolicy == ScrollPolicy.NONE) {
-      _reflowManager.invalidateCSS(_control, 'overflowX', 'hidden');
+      _reflowManager.invalidateCSS(_control, 'overflow-x', 'hidden');
     } else if (_horizontalScrollPolicy == ScrollPolicy.AUTO) {
-      _reflowManager.invalidateCSS(_control, 'overflowX', 'auto');
+      _reflowManager.invalidateCSS(_control, 'overflow-x', 'auto');
     } else {
-      _reflowManager.invalidateCSS(_control, 'overflowX', 'scroll');
+      _reflowManager.invalidateCSS(_control, 'overflow-x', 'auto');
     }
 
     if (_verticalScrollPolicy == ScrollPolicy.NONE) {
-      _reflowManager.invalidateCSS(_control, 'overflowY', 'hidden');
+      _reflowManager.invalidateCSS(_control, 'overflow-y', 'hidden');
     } else if (_verticalScrollPolicy == ScrollPolicy.AUTO) {
-      _reflowManager.invalidateCSS(_control, 'overflowY', 'auto');
+      _reflowManager.invalidateCSS(_control, 'overflow-y', 'auto');
     } else {
-      _reflowManager.invalidateCSS(_control, 'overflowY', 'scroll');
+      _reflowManager.invalidateCSS(_control, 'overflow-y', 'auto');
     }
   }
 }

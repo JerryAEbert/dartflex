@@ -1,4 +1,4 @@
-part of dartflex.components;
+part of dartflex;
 
 class DataGridItemRenderer extends ItemRenderer {
 
@@ -27,7 +27,7 @@ class DataGridItemRenderer extends ItemRenderer {
   set columns(ListCollection value) {
     if (value != _columns) {
       if (_columns != null) {
-        _columns.removeEventListener(
+        _columns.ignore(
             CollectionEvent.COLLECTION_CHANGED,
             _itemRenderers_collectionChangedHandler
         );
@@ -37,13 +37,13 @@ class DataGridItemRenderer extends ItemRenderer {
       _isColumnsChanged = true;
 
       if (value != null) {
-        value.addEventListener(
+        value.observe(
             CollectionEvent.COLLECTION_CHANGED,
             _itemRenderers_collectionChangedHandler
         );
       }
 
-      dispatch(
+      notify(
         new FrameworkEvent(
           'columnsChanged'
         )
@@ -60,6 +60,8 @@ class DataGridItemRenderer extends ItemRenderer {
   //---------------------------------
 
   DataGridItemRenderer({int gap: 0}) : super(elementId: null) {
+  	_className = 'DataGridItemRenderer';
+	
     _gap = gap;
 
     _layout = new HorizontalLayout();

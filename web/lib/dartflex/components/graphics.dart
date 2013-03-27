@@ -1,4 +1,4 @@
-part of dartflex.components;
+part of dartflex;
 
 class Graphics extends UIWrapper {
 
@@ -23,6 +23,8 @@ class Graphics extends UIWrapper {
   //---------------------------------
 
   Graphics({String elementId: null}) : super(elementId: elementId) {
+  	_className = 'Graphics';
+	
     _includeInLayout = false;
   }
 

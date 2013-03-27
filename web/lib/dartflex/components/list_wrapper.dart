@@ -1,4 +1,4 @@
-part of dartflex.components;
+part of dartflex;
 
 class ListWrapper extends Group {
 
@@ -20,7 +20,7 @@ class ListWrapper extends Group {
   set dataProvider(ListCollection value) {
     if (value != _dataProvider) {
       if (_dataProvider != null) {
-        _dataProvider.removeEventListener(
+        _dataProvider.ignore(
             CollectionEvent.COLLECTION_CHANGED,
             _dataProvider_collectionChangedHandler
         );
@@ -30,7 +30,7 @@ class ListWrapper extends Group {
       _isElementUpdateRequired = true;
 
       if (value != null) {
-        value.addEventListener(
+        value.observe(
             CollectionEvent.COLLECTION_CHANGED,
             _dataProvider_collectionChangedHandler
         );
@@ -62,7 +62,7 @@ class ListWrapper extends Group {
     if (value != _selectedIndex) {
       _selectedIndex = value;
 
-      dispatch(
+      notify(
           new FrameworkEvent(
             'selectedIndexChanged',
             relatedObject: value
@@ -84,7 +84,7 @@ class ListWrapper extends Group {
     if (value != _selectedItem) {
       _selectedItem = value;
 
-      dispatch(
+      notify(
           new FrameworkEvent(
             'selectedItemChanged',
             relatedObject: value
@@ -102,6 +102,7 @@ class ListWrapper extends Group {
   //---------------------------------
 
   ListWrapper({String elementId: null}) : super(elementId: elementId) {
+  	_className = 'ListWrapper';
   }
 
   //---------------------------------
@@ -164,7 +165,7 @@ class ListWrapper extends Group {
     Object element;
     int len = _dataProvider.length;
     int i;
-    
+
     _removeAllElements();
 
     for (i=0; i<len; i++) {

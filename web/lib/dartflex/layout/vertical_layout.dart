@@ -1,4 +1,4 @@
-part of dartflex.layout;
+part of dartflex;
 
 class VerticalLayout implements ILayout {
 
@@ -38,6 +38,15 @@ class VerticalLayout implements ILayout {
 
   bool get constrainToBounds => _constrainToBounds;
   set constrainToBounds(bool value) => _constrainToBounds = value;
+  
+  //---------------------------------
+  // align
+  //---------------------------------
+
+  String _align = 'top';
+
+  String get align => _align;
+  set align(String value) => _align = value;
 
   //---------------------------------
   //
@@ -58,78 +67,85 @@ class VerticalLayout implements ILayout {
   void doLayout(int width, int height, int pageItemSize, int pageOffset, int pageSize, List<IUIWrapper> elements) {
     UIWrapper element;
     int percHeight = height;
-    int pageHeightFloored = (pageItemSize == 0) ? 0 : pageOffset ~/ pageItemSize * pageItemSize;
+    final int pageHeightFloored = (pageItemSize == 0) ? 0 : pageOffset ~/ pageItemSize * pageItemSize;
     int offset = _useVirtualLayout ? pageHeightFloored : 0;
-    int w, h, sx;
+    int w, h, sx, i;
     int staticElmLen = 0;
+    final int len = elements.length;
     
-    elements.forEach(
-      (element) {
-        element.reflowManager.invalidateCSS(element.control, 'position', 'absolute');
-        
-        if (!element.includeInLayout) {
-          staticElmLen++;
-        } else if (
-            (element.percentHeight == 0.0) &&
-            (element.height > 0)
-        ) {
-          percHeight -= element.height;
+    for (i=0; i<len; i++) {
+      element = elements[i];
+      
+      element.reflowManager.invalidateCSS(element.control, 'position', 'absolute');
 
-          staticElmLen++;
-        }
+      if (!element.includeInLayout) {
+        staticElmLen++;
+      } else if (
+          (element.percentHeight == 0.0) &&
+          (element.height > 0)
+      ) {
+        percHeight -= element.height;
+
+        staticElmLen++;
       }
-    );
+    }
 
     sx = elements.length - staticElmLen;
 
     percHeight -= staticElmLen * _gap;
     
-    elements.forEach(
-        (element) {
-          if (element.includeInLayout) {
-            if (element.percentWidth > 0.0) {
-              w = (width * element.percentWidth * .01).toInt();
-            } else if (element.width > 0) {
-              w = element.width;
-            }
-
-            if (element.percentHeight > 0.0) {
-              h = (element.percentHeight * .01 * (percHeight - _gap * (sx - 1)) / sx).toInt();
-            } else if (element.height > 0) {
-              h = element.height;
-            }
-
-            w = (w == null) ? 0 : w;
-            h = (h == null) ? 0 : h;
-
-            if (_constrainToBounds) {
-              element.x = (width * .5 - w * .5).toInt();
-            }
-
-            if (
-                (pageSize == 0) ||
-                ((offset + h) <= pageSize)
-            ) {
-              element.y = offset + element.paddingTop;
-            } else {
-              element.y = 0;
-            }
-
-            if (_constrainToBounds && element.autoSize) {
-              element.width = w;
-            }
-
-            if (element.autoSize) {
-              element.height = h;
-            }
-
-            offset += h + _gap + element.paddingTop + element.paddingBottom;
-          } else {
-            element.x = 0;
-            element.y = 0;
-          }
+    i = elements.length;
+    
+    for (i=0; i<len; i++) {
+      element = elements[i];
+      
+      if (element.includeInLayout) {
+        if (element.percentWidth > 0.0) {
+          w = (width * element.percentWidth * .01).toInt();
+        } else if (element.width > 0) {
+          w = element.width;
         }
-    );
+
+        if (element.percentHeight > 0.0) {
+          h = (element.percentHeight * .01 * (percHeight - _gap * (sx - 1)) / sx).toInt();
+        } else if (element.height > 0) {
+          h = element.height;
+        }
+
+        w = (w == null) ? 0 : w;
+        h = (h == null) ? 0 : h;
+
+        if (_constrainToBounds) {
+          element.x = (width * .5 - w * .5).toInt();
+        }
+
+        if (
+            (pageSize == 0) ||
+            ((offset + h) <= pageSize)
+        ) {
+          if (_align == 'top') {
+            element.y = offset + element.paddingTop;
+          } else if (_align == 'bottom') {
+            element.y = height - offset - element.paddingTop - element.height;
+          }
+        } else {
+          element.y = 0;
+        }
+
+        if (_constrainToBounds && element.autoSize) {
+          element.width = w;
+        }
+
+        if (element.autoSize) {
+          element.height = h;
+        }
+
+        offset += h + _gap + element.paddingTop + element.paddingBottom;
+      } else {
+        element.x = 0;
+        element.y = 0;
+      }
+    }
   }
 
 }

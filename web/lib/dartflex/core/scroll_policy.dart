@@ -1,4 +1,4 @@
-part of dartflex.core;
+part of dartflex;
 
 class ScrollPolicy {
 

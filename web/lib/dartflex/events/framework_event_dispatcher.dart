@@ -1,4 +1,4 @@
-part of dartflex.events;
+part of dartflex;
 
 abstract class IFrameworkEventDispatcher {
 
@@ -8,10 +8,10 @@ abstract class IFrameworkEventDispatcher {
   //
   //-----------------------------------
 
-  bool hasEventListener(String type, Function eventHandler);
-  void addEventListener(String type, Function eventHandler);
-  void removeEventListener(String type, Function eventHandler);
-  void dispatch(FrameworkEvent event);
+  bool hasObserver(String type);
+  void observe(String type, Function eventHandler);
+  void ignore(String type, Function eventHandler);
+  void notify(FrameworkEvent event);
 
 }
 
@@ -22,12 +22,10 @@ class FrameworkEventDispatcher implements IFrameworkEventDispatcher {
   // Private properties
   //
   //-----------------------------------
-  
-  static ReflowManager _reflowManager = new ReflowManager();
 
   IFrameworkEventDispatcher _dispatcher;
 
-  List<FrameworkEventListenerValuePair> _listenerValuePairs = new List<FrameworkEventListenerValuePair>();
+  Map _observers = new Map();
 
   //-----------------------------------
   //
@@ -49,104 +47,53 @@ class FrameworkEventDispatcher implements IFrameworkEventDispatcher {
   //
   //-----------------------------------
 
-  bool hasEventListener(String type, Function eventHandler) {
-    if (eventHandler.toString() == 'Closure: (dynamic, FrameworkEvent) => dynamic') {
-      return false;
-    }
-
-    FrameworkEventListenerValuePair valuePair;
-    int i = _listenerValuePairs.length;
-
-    while (i > 0) {
-      valuePair = _listenerValuePairs[--i];
-
-      if (
-          (valuePair.type == type) &&
-          FunctionEqualityUtil.equals(valuePair.eventHandler, eventHandler)
-      ) {
-        return true;
-      }
-    }
-
-    return false;
+  bool hasObserver(String type) {
+    return (_observers[type] != null);
   }
 
-  void addEventListener(String type, Function eventHandler) {
-    if (!hasEventListener(type, eventHandler)) {
-      _listenerValuePairs.add(
-          new FrameworkEventListenerValuePair(type, eventHandler)
+  void observe(String type, Function eventHandler) {
+    List<Function> handlers;
+
+    if (!hasObserver(type)) {
+      _observers[type] = new List<Function>();
+    }
+
+    handlers = _observers[type] as List<Function>;
+
+    if (handlers.length > 0) {
+      ignore(type, eventHandler);
+    }
+
+    handlers.add(eventHandler);
+  }
+
+  void ignore(String type, Function eventHandler) {
+    int i;
+
+    if (_observers.containsKey(type)) {
+      List<Function> handlers = _observers[type];
+
+      i = handlers.length;
+
+      while (i > 0) {
+        if (FunctionEqualityUtil.equals(handlers[--i], eventHandler)) {
+          handlers.removeAt(i);
+
+          break;
+        }
+      }
+
+      if (handlers.length == 0) {
+        //_observers.remove(type);
+      }
+    }
+  }
+
+  void notify(FrameworkEvent event) {
+    if (_observers.containsKey(event.type)) {
+      _observers[event.type].forEach(
+          (Function handler) => handler(event)
       );
     }
   }
-
-  void removeEventListener(String type, Function eventHandler) {
-    int i = _listenerValuePairs.length;
-    FrameworkEventListenerValuePair valuePair;
-
-    while (i > 0) {
-      valuePair = _listenerValuePairs[--i];
-
-      if (
-          (type == valuePair.type) &&
-          FunctionEqualityUtil.equals(eventHandler, valuePair.eventHandler)
-      ) {
-        _listenerValuePairs.removeAt(i);
-      }
-    }
-  }
-
-  void dispatch(FrameworkEvent event) {
-    FrameworkEventListenerValuePair valuePair;
-    int i = _listenerValuePairs.length;
-
-    if (i > 0) {
-      event.currentTarget = _dispatcher;
-
-      while (i > 0) {
-        valuePair = _listenerValuePairs[--i];
-
-        if (event.type == valuePair.type) {
-          valuePair.eventHandler(event);
-        }
-      }
-    }
-  }
 }
-
-class FrameworkEventListenerValuePair {
-
-  //-----------------------------------
-  //
-  // Public properties
-  //
-  //-----------------------------------
-
-  //-----------------------------------
-  // type
-  //-----------------------------------
-
-  String _type;
-
-  String get type => _type;
-
-  //-----------------------------------
-  // eventHandler
-  //-----------------------------------
-
-  Function _eventHandler;
-
-  Function get eventHandler => _eventHandler;
-
-  //-----------------------------------
-  //
-  // Constructor
-  //
-  //-----------------------------------
-
-  FrameworkEventListenerValuePair(String type, Function eventHandler) {
-    _type = type;
-    _eventHandler = eventHandler;
-  }
-
-}
-

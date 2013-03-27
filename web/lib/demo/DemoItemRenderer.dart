@@ -44,7 +44,7 @@ class HeaderItemRenderer extends ItemRenderer {
       _button.label = data['label'];
     }
 
-    _button['click'] = (FrameworkEvent event) => dispatch(
+    _button['click'] = (FrameworkEvent event) => notify(
       new FrameworkEvent(
         'click',
         relatedObject: data
@@ -117,7 +117,7 @@ class IdItemRenderer extends ItemRenderer {
   }
 }
 
-class NameItemRenderer extends ItemRenderer {
+class ProductItemRenderer extends ItemRenderer {
 
   //---------------------------------
   //
@@ -140,12 +140,12 @@ class NameItemRenderer extends ItemRenderer {
   //
   //---------------------------------
 
-  NameItemRenderer({String elementId: null}) : super(elementId: null, autoDrawBackground: false) {
+  ProductItemRenderer({String elementId: null}) : super(elementId: null, autoDrawBackground: false) {
     layout = new HorizontalLayout();
   }
 
-  static NameItemRenderer construct() {
-    return new NameItemRenderer();
+  static ProductItemRenderer construct() {
+    return new ProductItemRenderer();
   }
 
   //---------------------------------
@@ -155,25 +155,17 @@ class NameItemRenderer extends ItemRenderer {
   //---------------------------------
 
   void createChildren() {
-    _icon = new Image()
-    ..width = 28
-    ..height = 28
-    ..paddingLeft = 5
-    ..source = 'http://www.igindo.com/dart/datagrid/user.png';
-
     _label = new RichText()
     ..percentWidth = 100.0
-    ..height = 18
-    ..paddingLeft = 5
-    ..text = (data != null) ? data['fullname'] : '';
+    ..paddingLeft = 3
+    ..text = (data != null) ? data['product'] : '';
 
-    add(_icon);
     add(_label);
   }
 
   void invalidateData() {
     if (_label != null) {
-      _label.text = (data != null) ? data['fullname'] : '';
+      _label.text = (data != null) ? data['product'] : '';
     }
   }
 }
@@ -224,7 +216,6 @@ class ManagerItemRenderer extends ItemRenderer {
 
     _label = new RichText()
     ..percentWidth = 100.0
-    ..height = 18
     ..paddingLeft = 5
     ..text = (data != null) ? data['manager'] : '';
 
@@ -239,7 +230,7 @@ class ManagerItemRenderer extends ItemRenderer {
   }
 }
 
-class JobItemRenderer extends ItemRenderer {
+class TagItemRenderer extends ItemRenderer {
 
   //---------------------------------
   //
@@ -247,7 +238,6 @@ class JobItemRenderer extends ItemRenderer {
   //
   //---------------------------------
 
-  Image _icon;
   RichText _label;
 
   //---------------------------------
@@ -262,12 +252,12 @@ class JobItemRenderer extends ItemRenderer {
   //
   //---------------------------------
 
-  JobItemRenderer({String elementId: null}) : super(elementId: null, autoDrawBackground: false) {
+  TagItemRenderer({String elementId: null}) : super(elementId: null, autoDrawBackground: false) {
     layout = new HorizontalLayout();
   }
 
-  static JobItemRenderer construct() {
-    return new JobItemRenderer();
+  static TagItemRenderer construct() {
+    return new TagItemRenderer();
   }
 
   //---------------------------------
@@ -277,25 +267,17 @@ class JobItemRenderer extends ItemRenderer {
   //---------------------------------
 
   void createChildren() {
-    _icon = new Image()
-    ..width = 28
-    ..height = 28
-    ..paddingLeft = 5
-    ..source = 'http://www.igindo.com/dart/datagrid/Briefcase.png';
-
     _label = new RichText()
     ..percentWidth = 100.0
-    ..height = 18
-    ..paddingLeft = 5
-    ..text = (data != null) ? data['job'] : '';
+    ..paddingLeft = 3
+    ..text = (data != null) ? data['tag'] : '';
 
-    add(_icon);
     add(_label);
   }
-
+  
   void invalidateData() {
     if (_label != null) {
-      _label.text = (data != null) ? data['job'] : '';
+      _label.text = (data != null) ? data['tag'] : '';
     }
   }
 }
@@ -308,7 +290,6 @@ class PhoneItemRenderer extends ItemRenderer {
   //
   //---------------------------------
 
-  Image _icon;
   RichText _label;
 
   //---------------------------------
@@ -338,21 +319,14 @@ class PhoneItemRenderer extends ItemRenderer {
   //---------------------------------
 
   void createChildren() {
-    _icon = new Image()
-    ..width = 28
-    ..height = 28
-    ..paddingLeft = 5
-    ..source = 'http://www.igindo.com/dart/datagrid/phone_icon.png';
-
     _label = new RichText()
     ..percentWidth = 100.0
-    ..height = 18
+    ..paddingLeft = 3
     ..text = (data != null) ? data['phone'] : '';
 
-    add(_icon);
     add(_label);
   }
-
+  
   void invalidateData() {
     if (_label != null) {
       _label.text = (data != null) ? data['phone'] : '';
@@ -460,11 +434,11 @@ class RatingItemRenderer extends ItemRenderer {
 
   void createChildren() {
     _spriteSheet = new SpriteSheet()
-    ..sheetWidth = 700
-    ..sheetHeight = 25
-    ..columnSize = 140
-    ..rowSize = 25
-    ..source = 'http://www.igindo.com/dart/datagrid/rating.png';
+    ..sheetWidth = 400
+    ..sheetHeight = 14
+    ..columnSize = 80
+    ..rowSize = 14
+    ..source = 'http://www.igindo.com/dart/m/rating.png';
 
     add(_spriteSheet);
   }
@@ -475,6 +449,60 @@ class RatingItemRenderer extends ItemRenderer {
         (_spriteSheet != null)
     ) {
       _spriteSheet.index = data['rating'];
+    }
+  }
+}
+
+class ToggleItemRenderer extends ItemRenderer {
+
+  //---------------------------------
+  //
+  // Protected properties
+  //
+  //---------------------------------
+
+  Toggle _toggle;
+
+  //---------------------------------
+  //
+  // Public properties
+  //
+  //---------------------------------
+
+  //---------------------------------
+  //
+  // Constructor
+  //
+  //---------------------------------
+
+  ToggleItemRenderer({String elementId: null}) : super(elementId: null, autoDrawBackground: false) {
+    layout = new HorizontalLayout();
+  }
+
+  static ToggleItemRenderer construct() {
+    return new ToggleItemRenderer();
+  }
+
+  //---------------------------------
+  //
+  // Public properties
+  //
+  //---------------------------------
+
+  void createChildren() {
+    _toggle = new Toggle()
+    ..width = 80
+    ..height = 30;
+
+    add(_toggle);
+  }
+
+  void invalidateData() {
+    if (
+        (data != null) &&
+        (_toggle != null)
+    ) {
+      //_toggle.index = data['rating'];
     }
   }
 }

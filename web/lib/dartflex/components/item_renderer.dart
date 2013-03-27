@@ -1,4 +1,4 @@
-part of dartflex.components;
+part of dartflex;
 
 abstract class IItemRenderer implements IUIWrapper {
 
@@ -46,10 +46,6 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   // Protected properties
   //
   //---------------------------------
-
-  Graphics _selectIndicator;
-  
-  bool _isSelectIndicatorRendered = false;
 
   //---------------------------------
   //
@@ -181,6 +177,8 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   //---------------------------------
 
   ItemRenderer({String elementId: null, bool autoDrawBackground: true}) : super(elementId: null) {
+  	_className = 'ItemRenderer';
+	
     _autoDrawBackground = autoDrawBackground;
   }
 
@@ -233,13 +231,9 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
 
     _setControl(container);
 
-    _reflowManager.invalidateCSS(_control, 'overflow', 'hidden');
-    _reflowManager.invalidateCSS(container, 'border', '1px solid #cccccc');
-    
-    _selectIndicator = new Graphics()
-    ..includeInLayout = false;
-
-    add(_selectIndicator, prepend: true);
+    //_reflowManager.invalidateCSS(container, 'transition', 'y 2s');
+    _reflowManager.invalidateCSS(container, 'overflow', 'hidden');
+    //_reflowManager.invalidateCSS(container, 'border', '1px solid #cccccc');
 
     createChildren();
 
@@ -263,54 +257,7 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   }
 
   void _updateAfterInteraction() {
-    if (!_autoDrawBackground) {
-      return;
-    }
-
-    if (
-        (_selectIndicator != null) &&
-        (_selectIndicator.context != null)
-    ) {
-      double targetOpacity;
-      
-      if (_selected) {
-        _reflowManager.invalidateCSS(_selectIndicator._control, 'transition', 'opacity .5s');
-        _reflowManager.invalidateCSS(_selectIndicator._control, '-o-transition', 'opacity .5s');
-        _reflowManager.invalidateCSS(_selectIndicator._control, '-webkit-transition', 'opacity .5s');
-        _reflowManager.invalidateCSS(_selectIndicator._control, '-moz-transition', 'opacity .5s');
-        
-        targetOpacity = 1.0;
-      } else if (_state != 'mouseout') {
-        _reflowManager.invalidateCSS(_selectIndicator._control, 'transition', 'opacity 0s');
-        
-        targetOpacity = 0.5;
-      } else {
-        _reflowManager.invalidateCSS(_selectIndicator._control, 'transition', 'opacity .5s');
-        
-        targetOpacity = 0.0;
-      }
-      
-      _drawSelectIndicator();
-      
-      _reflowManager.invalidateCSS(_selectIndicator._control, 'opacity', targetOpacity.toString());
-    } else {
-      later > _updateAfterInteraction;
-    }
-
     updateAfterInteraction();
-  }
-  
-  void _drawSelectIndicator() {
-    _selectIndicator.x = _x;
-    _selectIndicator.y = _y;
-    _selectIndicator.width = _width;
-    _selectIndicator.height = _height;
-    
-    _selectIndicator.context.clearRect(0, 0, _width, _height);
-    _selectIndicator.context.beginPath();
-    _selectIndicator.context.fillStyle = '#80bbee';
-    _selectIndicator.context.fillRect(0, 0, _width, _height);
-    _selectIndicator.context.closePath();
   }
 }
 

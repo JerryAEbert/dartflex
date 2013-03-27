@@ -1,301 +1,167 @@
 
 html,body {
   background-color: #fcfcfc;
-  font-family: arial;
+  font-family: calibri, arial;
   font-size: 14px;
   font-weight: normal;
-  line-height: 1.2em;
-  margin: 15px;
-  position: relative;
+  position: fixed;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
 }
 
-button {
-  -moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
-  -webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
-  box-shadow:inset 0px 1px 0px 0px #ffffff;
-  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
-  background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
-  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
-  background-color:#ededed;
-  -moz-border-radius:6px;
-  -webkit-border-radius:6px;
-  border-radius:6px;
-  border:1px solid #dcdcdc;
-  display:inline-block;
-  color:#777777;
-  font-family:arial;
-  font-size:15px;
-  font-weight:bold;
-  padding:6px 24px;
-  text-decoration:none;
-  text-shadow:1px 1px 0px #ffffff;
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
-  border-bottom-left-radius: 0px;
-  border-bottom-right-radius: 0px;
-}
-
-button:hover {
-  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
-  background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
-  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
-  background-color:#dfdfdf;
-}
-
-#header1 {
-  font-size: 48px;
-  line-height: 30px;
-  letter-spacing: -1px;
-  color: #333;
-  margin: 0px 0px 0px 0px;
-  padding: 0px 0px 0px 0px;
-  font-weight: 100;
-}
-
-#header2 {
-  font-size: 28px;
-  line-height: 20px;
-  letter-spacing: -1px;
-  color: #444;
-}
-
-#foreword {
-  font-size: 14px;
+._Header {
+  color: #ffffff;
   font-weight: bold;
-  color: #cc0000;
+  font-size: 16px;
+  background: -webkit-linear-gradient(top, #7fb2f0, #4e7ac7);
+  background: -moz-linear-gradient(top, #7fb2f0, #4e7ac7);
+  background: -ms-linear-gradient(top, #7fb2f0, #4e7ac7);
+  background: -o-linear-gradient(top, #7fb2f0, #4e7ac7);
+  vertical-align: middle;
 }
 
-#paragraph {
-  font-size: 13px;
-  color: #444;
+._Footer {
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 16px;
+  background: -webkit-linear-gradient(top, #7fb2f0, #4e7ac7);
+  background: -moz-linear-gradient(top, #7fb2f0, #4e7ac7);
+  background: -ms-linear-gradient(top, #7fb2f0, #4e7ac7);
+  background: -o-linear-gradient(top, #7fb2f0, #4e7ac7);
+  vertical-align: middle;
 }
 
-#divContainer {
-  width: 100%;
-  height: 400px;
-  position: relative;
-  border: 1px solid #ccc;
-  background-color: #fff;
+._Toggle {
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+  border: 1px solid #cccccc;
+  background: -webkit-linear-gradient(top, #95ba76, #7ca55d);
+  background: -moz-linear-gradient(top, #ffffff, #dddddd);
+  background: -ms-linear-gradient(top, #ffffff, #dddddd);
+  background: -o-linear-gradient(top, #ffffff, #dddddd);
 }
 
-#container01 {
-  width: 120px;
-  height: 60px;
-  padding: 8px 8px 8px 8px;
-  margin: 8px 8px 8px 8px;
-  position: relative;
+._ToggleHandle {
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+  border: 1px solid #808080;
+  background: -webkit-linear-gradient(top, #ffffff, #dddddd);
+  background: -moz-linear-gradient(top, #ffffff, #dddddd);
+  background: -ms-linear-gradient(top, #ffffff, #dddddd);
+  background: -o-linear-gradient(top, #ffffff, #dddddd);
+}
+ 
+/*._ListRenderer {
+  -webkit-overflow-scrolling: touch;
+}*/
+
+._Button {
+  -webkit-transition: color 0.7s ease-in-out;
+  -webkit-transition: background-color 0.7s ease-in-out;
+  -webkit-transition: border-right 0.7s ease-in-out;
+  -webkit-transition: border-top 0.7s ease-in-out;
+  -m-transition: color 0.7s ease-in-out;
+  -m-transition: background-color 0.7s ease-in-out;
+  -m-transition: border-right 0.7s ease-in-out;
+  -m-transition: border-top 0.7s ease-in-out;
+  -o-transition: color 0.7s ease-in-out;
+  -o-transition: background-color 0.7s ease-in-out;
+  -o-transition: border-right 0.7s ease-in-out;
+  -o-transition: border-top 0.7s ease-in-out;
+  -ms-transition: color 0.7s ease-in-out;
+  -ms-transition: background-color 0.7s ease-in-out;
+  -ms-transition: border-right 0.7s ease-in-out;
+  -ms-transition: border-top 0.7s ease-in-out;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 16px;
+  text-align: left;
+  margin: 0px;
+  padding-left: 5px;
+  display: block;
+  outline: none;
+  background-color: #35478c;
+  border-left: 0px none;
+  border-right: 2px solid #ffffff;
+  border-top: 4px solid #7fb2f0;
+  border-bottom: 0px none;
 }
 
-#container02 {
-  width: 400px;
-  height: 300px;
-  padding: 8px 8px 8px 8px;
-  margin: 8px 8px 8px 8px;
-  position: relative;
+._Button:hover {
+  color: #35478c;
+  background-color: #7fb2f0;
+  border-top: 4px solid #35478c;
 }
 
-#target {
-  width: auto;
-  height: 496px;
-  min-height: 496px;
-  padding: 8px 8px 8px 8px;
-  margin: 8px 8px 8px 8px;
-  position: relative;
-}
-
-#codeContainer {
-  font-family: arial;
-  overflow: auto;
-  width: 400px;
-  padding: 8px 8px 8px 8px;
-  margin: 8px 8px 8px 8px;
-  position: relative;
-  border: 1px solid #ccc;
-  background-color: #fff;
-}
-
-.dp-highlighter
-{
-  font-family: "Consolas", "Courier New", Courier, mono, serif;
-  font-size: 12px;
-  background-color: #E7E5DC;
-  width: 99%;
-  overflow: auto;
-  margin: 18px 0 18px 0 !important;
-  padding-top: 1px; /* adds a little border on top when controls are hidden */
-}
-
-/* clear styles */
-.dp-highlighter ol,
-.dp-highlighter ol li,
-.dp-highlighter ol li span 
-{
-  margin: 0;
-  padding: 0;
-  border: none;
-}
-
-.dp-highlighter a,
-.dp-highlighter a:hover
-{
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-
-.dp-highlighter .bar
-{
-  padding-left: 45px;
-}
-
-.dp-highlighter.collapsed .bar,
-.dp-highlighter.nogutter .bar
-{
-  padding-left: 0px;
-}
-
-.dp-highlighter ol
-{
-  list-style: decimal; /* for ie */
-  background-color: #fff;
-  margin: 0px 0px 1px 45px !important; /* 1px bottom margin seems to fix occasional Firefox scrolling */
-  padding: 0px;
-  color: #5C5C5C;
-}
-
-.dp-highlighter.nogutter ol,
-.dp-highlighter.nogutter ol li
-{
-  list-style: none !important;
-  margin-left: 0px !important;
-}
-
-.dp-highlighter ol li,
-.dp-highlighter .columns div
-{
-  list-style: decimal-leading-zero; /* better look for others, override cascade from OL */
-  list-style-position: outside !important;
-  border-left: 3px solid #6CE26C;
-  background-color: #F8F8F8;
-  color: #5C5C5C;
-  padding: 0 3px 0 10px !important;
-  margin: 0 !important;
-  line-height: 14px;
-}
-
-.dp-highlighter.nogutter ol li,
-.dp-highlighter.nogutter .columns div
-{
+.backButton {
+  -webkit-appearance: none;
+  -m-appearance: none;
+  -o-appearance: none;
+  -ms-appearance: none;
+  background: transparent;
   border: 0;
+  display:block;
+  background:url(http://www.igindo.com/dart/m/backButton.png) 0 0 no-repeat;
 }
 
-.dp-highlighter .columns
-{
-  background-color: #F8F8F8;
-  color: gray;
-  overflow: hidden;
-  width: 100%;
+.options {
+  -webkit-appearance: none;
+  -m-appearance: none;
+  -o-appearance: none;
+  -ms-appearance: none;
+  line-height: 0;
+  background: transparent;
+  border: 0;
+  display:block;
+  background:url(http://www.igindo.com/dart/m/gear.png) 0 0 no-repeat;
 }
 
-.dp-highlighter .columns div
-{
-  padding-bottom: 5px;
+._DataGridItemRenderer {
+  background: -webkit-gradient(linear, 0 2, 0% 0%, from(#ffffff), to(#dddddd));
+  background: -moz-gradient(linear, 0 2, 0% 0%, from(#ffffff), to(#dddddd));
+  background: -ms-gradient(linear, 0 2, 0% 0%, from(#ffffff), to(#dddddd));
+  background: -o-gradient(linear, 0 2, 0% 0%, from(#ffffff), to(#dddddd));
 }
 
-.dp-highlighter ol li.alt
-{
-  background-color: #FFF;
-  color: inherit;
+/*@media handheld {
+  ._DataGridItemRenderer:hover {
+    background-color: #ffffff;
+  }
 }
 
-.dp-highlighter ol li span
-{
-  color: black;
-  background-color: inherit;
-}
+@media screen {
+  ._DataGridItemRenderer:hover {
+    background-color: #d3e5fa;
+    -webkit-transition: background-color 300ms linear;
+    -moz-transition: background-color 300ms linear;
+    -o-transition: background-color 300ms linear;
+    -ms-transition: background-color 300ms linear;
+    transition: background-color 300ms linear;
+  }
+}*/
 
-/* Adjust some properties when collapsed */
-
-.dp-highlighter.collapsed ol
-{
+._ProductItemRenderer {
+  font-size: 18px;
   margin: 0px;
 }
 
-.dp-highlighter.collapsed ol li
-{
-  display: none;
+._TagItemRenderer {
+  font-size: 18px;
+  margin: 0px;
 }
 
-/* Additional modifications when in print-view */
-
-.dp-highlighter.printing
-{
-  border: none;
+._PhoneItemRenderer {
+  font-size: 18px;
+  margin: 0px;
 }
 
-.dp-highlighter.printing .tools
-{
-  display: none !important;
+#target {
+  position: fixed;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
-
-.dp-highlighter.printing li
-{
-  display: list-item !important;
-}
-
-/* Styles for the tools */
-
-.dp-highlighter .tools
-{
-  padding: 3px 8px 3px 10px;
-  font: 9px Verdana, Geneva, Arial, Helvetica, sans-serif;
-  color: silver;
-  background-color: #f8f8f8;
-  padding-bottom: 10px;
-  border-left: 3px solid #6CE26C;
-}
-
-.dp-highlighter.nogutter .tools
-{
-  border-left: 0;
-}
-
-.dp-highlighter.collapsed .tools
-{
-  border-bottom: 0;
-}
-
-.dp-highlighter .tools a
-{
-  font-size: 9px;
-  color: #a0a0a0;
-  background-color: inherit;
-  text-decoration: none;
-  margin-right: 10px;
-}
-
-.dp-highlighter .tools a:hover
-{
-  color: red;
-  background-color: inherit;
-  text-decoration: underline;
-}
-
-/* About dialog styles */
-
-.dp-about { background-color: #fff; color: #333; margin: 0px; padding: 0px; }
-.dp-about table { width: 100%; height: 100%; font-size: 11px; font-family: Tahoma, Verdana, Arial, sans-serif !important; }
-.dp-about td { padding: 10px; vertical-align: top; }
-.dp-about .copy { border-bottom: 1px solid #ACA899; height: 95%; }
-.dp-about .title { color: red; background-color: inherit; font-weight: bold; }
-.dp-about .para { margin: 0 0 4px 0; }
-.dp-about .footer { background-color: #ECEADB; color: #333; border-top: 1px solid #fff; text-align: right; }
-.dp-about .close { font-size: 11px; font-family: Tahoma, Verdana, Arial, sans-serif !important; background-color: #ECEADB; color: #333; width: 60px; height: 22px; }
-
-/* Language specific styles */
-
-.dp-highlighter .comment, .dp-highlighter .comments { color: #008200; background-color: inherit; }
-.dp-highlighter .string { color: blue; background-color: inherit; }
-.dp-highlighter .keyword { color: #069; font-weight: bold; background-color: inherit; }
-.dp-highlighter .preprocessor { color: gray; background-color: inherit; }

@@ -1,4 +1,4 @@
-part of dartflex.core;
+part of dartflex;
 
 class ReflowManager {
 
@@ -8,25 +8,42 @@ class ReflowManager {
   //
   //---------------------------------
 
+  static ReflowManager _instance;
+  
+  List<MethodInvokationMap> _scheduledHandlers = new List<MethodInvokationMap>();
   List<ElementCSSMap> _elements = new List<ElementCSSMap>();
   
-  bool _hasFinalHandler = false;
-  
-  final Element _detachedElement = new HtmlElement();
-  final RegExp _pattern = new RegExp('[A-Z]');
-  
-  //---------------------------------
-  // currentNextInterval
-  //---------------------------------
-  
-  Future _currentNextInterval;
+  bool _hasCommittedAllScheduledHandlers = false;
+  bool _hasCommittedAllPendingCSSProperties = false;
 
-  Future get currentNextInterval {
-    if (_currentNextInterval == null) {
-      _currentNextInterval = awaitNextInterval();
+  final Element _detachedElement = new HtmlElement();
+
+  //---------------------------------
+  // preRendering
+  //---------------------------------
+
+  Future _preRendering;
+
+  Future get preRendering {
+    if (_preRendering == null) {
+      _preRendering = _requestPreRenderingSlot();
     }
 
-    return _currentNextInterval;
+    return _preRendering;
+  }
+  
+  //---------------------------------
+  // postRendering
+  //---------------------------------
+
+  Future _postRendering;
+
+  Future get postRendering {
+    if (_postRendering == null) {
+      _postRendering = _requestPostRenderingSlot();
+    }
+
+    return _postRendering;
   }
 
   //---------------------------------
@@ -35,13 +52,63 @@ class ReflowManager {
   //
   //---------------------------------
 
-  ReflowManager();
+  //---------------------------------
+  // Singleton
+  //---------------------------------
+
+  ReflowManager._construct();
+
+  factory ReflowManager() {
+    if (_instance == null) {
+      _instance = new ReflowManager._construct();
+    }
+
+    return _instance;
+  }
 
   //-----------------------------------
   //
   // Public methods
   //
   //-----------------------------------
+  
+  void scheduleMethod(dynamic owner, Function method, List arguments) {
+    //Function.apply(method, arguments); return;
+    
+    MethodInvokationMap invokation;
+    bool hasOccurance = false;
+    int i = _scheduledHandlers.length;
+
+    while (i > 0) {
+      invokation = _scheduledHandlers[--i];
+
+      if (
+          (invokation.owner == owner) &&
+          FunctionEqualityUtil.equals(invokation.method, method)
+      ) {
+        hasOccurance = true;
+
+        break;
+      }
+    }
+    
+    if (!hasOccurance) {
+      invokation = new MethodInvokationMap()
+      ..owner = owner
+      ..method = method
+      ..arguments = arguments;
+
+      _scheduledHandlers.add(invokation);
+    } else {
+      invokation.arguments = arguments;
+    }
+    
+    if (!_hasCommittedAllScheduledHandlers) {
+      _hasCommittedAllScheduledHandlers = true;
+      
+      preRendering.whenComplete(_commitAllScheduledHandlers);
+    }
+  }
 
   void invalidateCSS(Element element, String property, String value) {
     if (element == null) {
@@ -51,7 +118,7 @@ class ReflowManager {
     ElementCSSMap elementCSSMap;
     bool hasOccurance = false;
     int i = _elements.length;
-    
+
     while (i > 0) {
       elementCSSMap = _elements[--i];
 
@@ -67,63 +134,108 @@ class ReflowManager {
       ..element = element
       ..cssDecl = new Map();
 
-      _elements.addLast(elementCSSMap);
+      _elements.add(elementCSSMap);
     }
-    
+
     elementCSSMap.cssDecl[property] = value;
     
-    if (!_hasFinalHandler) {
-      _hasFinalHandler = true;
-      
-      currentNextInterval.whenComplete(_commitAllPendingCSSProperties);
+    if (!_hasCommittedAllPendingCSSProperties) {
+      _hasCommittedAllPendingCSSProperties = true;
+
+      postRendering.then(_commitAllPendingCSSProperties);
     }
   }
-
-  void _commitAllPendingCSSProperties() {
-    _elements.forEach(_commitCSSProperties);
-
-    _elements = new List<ElementCSSMap>();
-
-    _currentNextInterval = null;
-    _hasFinalHandler = false;
-  }
   
-  void _commitCSSProperties(ElementCSSMap elementCSSMap) {
-    _detachedElement.style.cssText = elementCSSMap.element.style.cssText;
-
-    elementCSSMap.cssDecl.forEach(_commitCSSProperty);
-        
-    elementCSSMap.element.style.cssText = _detachedElement.style.cssText;
-  }
-  
-  void _commitCSSProperty(String propertyName, String value) {
-    String propertyNameCopy = propertyName;
-    String pm, pmA, pmB;
+  void _commitAllScheduledHandlers() {
+    MethodInvokationMap invokation;
+    int i = _scheduledHandlers.length;
     
-    _pattern.allMatches(propertyName).forEach(
-        (Match patternMatch) {
-          pm = patternMatch.str.substring(patternMatch.start, patternMatch.end).toLowerCase();
-          pmA = patternMatch.str.substring(0, patternMatch.start);
-          pmB = patternMatch.str.substring(patternMatch.end);
+    _hasCommittedAllScheduledHandlers = false;
+    
+    while (i > 0) {
+      invokation = _scheduledHandlers[--i];
+      
+      Function.apply(invokation.method, invokation.arguments);
+      
+      _scheduledHandlers.removeAt(i);
+    }
 
-          propertyNameCopy = '${pmA}-$pm$pmB';
-        }
+    _preRendering = null;
+  }
+
+  void _commitAllPendingCSSProperties(_) {
+    ElementCSSMap elementCSSMap;
+    int i = _elements.length;
+    bool hasUpdate;
+    
+    _hasCommittedAllPendingCSSProperties = false;
+    
+    _detachedElement.hidden = true;
+    
+    while (i > 0) {
+      elementCSSMap = _elements[--i];
+      
+      _detachedElement.style.cssText = elementCSSMap.element.style.cssText;
+      
+      hasUpdate = false;
+
+      elementCSSMap.cssDecl.forEach(
+          (String propertyName, String value) {
+            if (_detachedElement.style.getPropertyValue(propertyName) != value) {
+              hasUpdate = true;
+              
+              _detachedElement.style.setProperty(propertyName, value, '');
+            }
+          }
+      );
+
+      if (hasUpdate) {
+        elementCSSMap.element.style.cssText = _detachedElement.style.cssText;
+      }
+      
+      _elements.removeAt(i);
+    }
+
+    _postRendering = null;
+  }
+  
+  Future _requestPreRenderingSlot() {
+    final Completer completer = new Completer();
+    
+    window.requestAnimationFrame(
+        (_) => completer.complete()
     );
-    
-    _detachedElement.style.setProperty(propertyNameCopy, value, '');
-    /*_detachedElement.style.setProperty('-moz-$propertyName', value, '');
-    _detachedElement.style.setProperty('-ms-$propertyName', value, '');
-    _detachedElement.style.setProperty('-o-$propertyName', value, '');
-    _detachedElement.style.setProperty('-webkit-$propertyName', value, '');*/
-  }
-
-  Future awaitNextInterval() {
-    final completer = new Completer();
-
-    window.setImmediate(completer.complete);
 
     return completer.future;
   }
+  
+  Completer _postCompleter;
+  
+  Future _requestPostRenderingSlot() {
+    if (_postCompleter != null) {
+      return _postCompleter.future;
+    }
+    
+    _postCompleter = new Completer();
+    
+    window.setImmediate(
+        () {
+          _postCompleter.complete();
+          
+          _postCompleter = null;
+        }
+    );
+
+    return _postCompleter.future;
+  }
+}
+
+class MethodInvokationMap {
+
+  dynamic owner;
+  Function method;
+  List arguments;
+
 }
 
 class ElementCSSMap {

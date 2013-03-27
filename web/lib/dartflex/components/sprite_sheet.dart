@@ -1,4 +1,4 @@
-part of dartflex.components;
+part of dartflex;
 
 class SpriteSheet extends Group {
 
@@ -25,7 +25,7 @@ class SpriteSheet extends Group {
     if (value != _source) {
       _source = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent(
           'sourceChanged'
         )
@@ -46,7 +46,7 @@ class SpriteSheet extends Group {
     if (value != _index) {
       _index = value;
 
-      dispatch(
+      notify(
           new FrameworkEvent(
               'indexChanged'
           )
@@ -68,7 +68,7 @@ class SpriteSheet extends Group {
       _columnSize = value;
       width = value;
 
-      dispatch(
+      notify(
           new FrameworkEvent(
               'columnSizeChanged'
           )
@@ -90,7 +90,7 @@ class SpriteSheet extends Group {
       _rowSize = value;
       height = value;
 
-      dispatch(
+      notify(
           new FrameworkEvent(
               'rowSizeChanged'
           )
@@ -111,7 +111,7 @@ class SpriteSheet extends Group {
     if (value != _sheetWidth) {
       _sheetWidth = value;
 
-      dispatch(
+      notify(
           new FrameworkEvent(
               'sheetWidthChanged'
           )
@@ -132,7 +132,7 @@ class SpriteSheet extends Group {
     if (value != _sheetHeight) {
       _sheetHeight = value;
 
-      dispatch(
+      notify(
           new FrameworkEvent(
               'sheetHeightChanged'
           )
@@ -149,6 +149,7 @@ class SpriteSheet extends Group {
   //---------------------------------
 
   SpriteSheet() : super() {
+  	_className = 'SpriteSheet';
   }
 
   //---------------------------------
@@ -167,13 +168,13 @@ class SpriteSheet extends Group {
     super._createChildren();
 
     if (_source != null) {
-      _reflowManager.invalidateCSS(_control, 'backgroundImage', 'url($_source)');
+      _reflowManager.invalidateCSS(_control, 'background-image', 'url($_source)');
     }
   }
 
   void _updateSource() {
     if (_control != null) {
-      _reflowManager.invalidateCSS(_control, 'backgroundImage', 'url($_source)');
+      _reflowManager.invalidateCSS(_control, 'background-image', 'url($_source)');
     }
   }
 
@@ -199,7 +200,7 @@ class SpriteSheet extends Group {
       final int posX = column * _columnSize;
       final int posY = row * _rowSize;
 
-      _reflowManager.invalidateCSS(_control, 'backgroundPosition', '$posX$px $posY$px');
+      _reflowManager.invalidateCSS(_control, 'background-position', '$posX$px $posY$px');
     }
   }
 }

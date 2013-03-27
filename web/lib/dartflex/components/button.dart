@@ -1,4 +1,4 @@
-part of dartflex.components;
+part of dartflex;
 
 class Button extends UIWrapper {
 
@@ -19,7 +19,7 @@ class Button extends UIWrapper {
     if (value != _label) {
       _label = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent(
           'labelChanged'
         )
@@ -36,6 +36,7 @@ class Button extends UIWrapper {
   //---------------------------------
 
   Button({String elementId: null}) : super(elementId: elementId) {
+    _className = 'Button';
   }
 
   //---------------------------------
@@ -55,11 +56,19 @@ class Button extends UIWrapper {
       ButtonElement element = new ButtonElement();
 
       element.onClick.listen(
-        (Event event) => dispatch(
+        (Event event) => notify(
           new FrameworkEvent(
             'click'
           )
         )
+      );
+      
+      element.onTouchLeave.listen(
+          (Event event) => notify(
+              new FrameworkEvent(
+                  'click'
+              )
+          )
       );
 
       _setControl(element);
@@ -70,16 +79,16 @@ class Button extends UIWrapper {
 
   void _commitLabel() {
     if (_control != null) {
-      ButtonElement element = _control as ButtonElement;
-
-      _reflowManager.currentNextInterval.then(
-          (_) {
-            element.text = _label;
-          }
-      );
+      _reflowManager.scheduleMethod(this, _updateElementText, [_label]);
     } else {
       later > _commitLabel;
     }
+  }
+  
+  void _updateElementText(String label) {
+    ButtonElement element = _control as ButtonElement;
+    
+    element.text = label;
   }
 }
 

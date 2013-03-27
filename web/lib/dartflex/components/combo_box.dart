@@ -1,4 +1,4 @@
-part of dartflex.components;
+part of dartflex;
 
 class ComboBox extends ListWrapper {
 
@@ -9,6 +9,7 @@ class ComboBox extends ListWrapper {
   //---------------------------------
 
   ComboBox() : super(elementId: null) {
+    _className = 'ComboBox';
   }
 
   //---------------------------------

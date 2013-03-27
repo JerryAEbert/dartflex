@@ -1,4 +1,4 @@
-part of dartflex.components;
+part of dartflex;
 
 class Image extends UIWrapper {
 
@@ -13,15 +13,13 @@ class Image extends UIWrapper {
   //---------------------------------
 
   String _source;
-  bool _isSourceChanged = false;
 
   String get source => _source;
   set source(String value) {
     if (value != _source) {
       _source = value;
-      _isSourceChanged = true;
 
-      dispatch(
+      notify(
           new FrameworkEvent('sourceChanged')
       );
 
@@ -42,6 +40,7 @@ class Image extends UIWrapper {
   //---------------------------------
 
   Image({String elementId: null}) : super(elementId: elementId) {
+  	_className = 'Image';
   }
 
   //---------------------------------
@@ -61,8 +60,8 @@ class Image extends UIWrapper {
       DivElement controlCast = new DivElement();
 
       _reflowManager.invalidateCSS(controlCast, 'overflow', 'hidden');
-      _reflowManager.invalidateCSS(controlCast, 'backgroundRepeat', 'no-repeat');
-      _reflowManager.invalidateCSS(controlCast, 'backgroundImage', 'url($_source)');
+      _reflowManager.invalidateCSS(controlCast, 'background-repeat', 'no-repeat');
+      _reflowManager.invalidateCSS(controlCast, 'background-rmage', 'url($_source)');
 
       _setControl(controlCast);
     }
@@ -76,11 +75,7 @@ class Image extends UIWrapper {
     if (_control != null) {
       DivElement controlCast = _control as DivElement;
 
-      if (_isSourceChanged) {
-        _isSourceChanged = false;
-
-        _reflowManager.invalidateCSS(controlCast, 'backgroundImage', 'url($_source)');
-      }
+      _reflowManager.invalidateCSS(controlCast, 'background-image', 'url($_source)');
     }
   }
 }

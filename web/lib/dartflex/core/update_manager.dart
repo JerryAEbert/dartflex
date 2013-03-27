@@ -1,4 +1,4 @@
-part of dartflex.core;
+part of dartflex;
 
 class UpdateManager {
 
@@ -11,7 +11,7 @@ class UpdateManager {
   Map _pendingHandlers = new Map();
   List<Function> _pendingHandlersJS = new List<Function>();
 
-  static ReflowManager reflowManager = new ReflowManager();
+  static ReflowManager _reflowManager = new ReflowManager();
 
   //---------------------------------
   //
@@ -41,9 +41,9 @@ class UpdateManager {
         }
       }
 
-      _pendingHandlersJS.addLast(handler);
+      _pendingHandlersJS.add(handler);
 
-      reflowManager.currentNextInterval.then(
+      _reflowManager.preRendering.then(
           (_) {
             i = _pendingHandlersJS.length;
 
@@ -68,7 +68,7 @@ class UpdateManager {
 
       _pendingHandlers[fncToString] = true;
 
-      reflowManager.currentNextInterval.then(
+      _reflowManager.preRendering.then(
           (_) {
             _pendingHandlers.remove(fncToString);
 

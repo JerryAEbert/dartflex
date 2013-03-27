@@ -1,4 +1,4 @@
-part of dartflex.components;
+part of dartflex;
 
 abstract class IUIWrapper implements IFrameworkEventDispatcher {
 
@@ -43,6 +43,9 @@ abstract class IUIWrapper implements IFrameworkEventDispatcher {
 
   int get paddingBottom;
   set paddingBottom(int value);
+  
+  bool get inheritsDefaultCSS;
+  set inheritsDefaultCSS(bool value);
 
   ILayout get layout;
   set layout(ILayout value);
@@ -56,15 +59,18 @@ abstract class IUIWrapper implements IFrameworkEventDispatcher {
   List<IUIWrapper> get children;
 
   String get elementId;
+  
+  String get className;
 
   Element get control;
-
+  
+  void preInitialize(IUIWrapper forOwner);
   void invalidateProperties();
   void add(IUIWrapper element, {bool prepend: false});
   void remove(IUIWrapper element);
   void removeAll();
 
-  void operator []=(String type, Function eventHandler) => addEventListener(type, eventHandler);
+  void operator []=(String type, Function eventHandler) => observe(type, eventHandler);
 
 }
 
@@ -114,6 +120,27 @@ class UIWrapper implements IUIWrapper {
 
     return _graphics;
   }
+  
+  //---------------------------------
+  // classes
+  //---------------------------------
+
+  Collection<String> _classes;
+  bool _isClassesChanged = false;
+
+  Collection<String> get classes => _classes;
+
+  set classes(Collection<String> value) {
+    if (value != _classes) {
+      _classes = value;
+
+      notify(
+        new FrameworkEvent('classesChanged')
+      );
+
+      invalidateProperties();
+    }
+  }
 
   //---------------------------------
   // includeInLayout
@@ -127,7 +154,7 @@ class UIWrapper implements IUIWrapper {
     if (value != _includeInLayout) {
       _includeInLayout = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('includeInLayoutChanged')
       );
 
@@ -151,7 +178,7 @@ class UIWrapper implements IUIWrapper {
     if (value != _autoSize) {
       _autoSize = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('autoSizeChanged')
       );
 
@@ -175,7 +202,7 @@ class UIWrapper implements IUIWrapper {
     if (value != _visible) {
       _visible = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('visibleChanged')
       );
 
@@ -195,10 +222,10 @@ class UIWrapper implements IUIWrapper {
     if (value != _x) {
       _x = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('xChanged')
       );
-      
+
       _updateControl(1);
     }
   }
@@ -215,7 +242,7 @@ class UIWrapper implements IUIWrapper {
     if (value != _y) {
       _y = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('yChanged')
       );
 
@@ -235,7 +262,7 @@ class UIWrapper implements IUIWrapper {
     if (value != _width) {
       _width = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('widthChanged')
       );
 
@@ -257,7 +284,7 @@ class UIWrapper implements IUIWrapper {
     if (value != _percentWidth) {
       _percentWidth = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('percentWidthChanged')
       );
 
@@ -277,7 +304,7 @@ class UIWrapper implements IUIWrapper {
     if (value != _height) {
       _height = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('heightChanged')
       );
 
@@ -299,7 +326,7 @@ class UIWrapper implements IUIWrapper {
     if (value != _percentHeight) {
       _percentHeight = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('percentHeightChanged')
       );
 
@@ -319,7 +346,7 @@ class UIWrapper implements IUIWrapper {
     if (value != _paddingLeft) {
       _paddingLeft = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('paddingLeftChanged')
       );
 
@@ -339,7 +366,7 @@ class UIWrapper implements IUIWrapper {
     if (value != _paddingRight) {
       _paddingRight = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('paddingRightChanged')
       );
 
@@ -359,7 +386,7 @@ class UIWrapper implements IUIWrapper {
     if (value != _paddingTop) {
       _paddingTop = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('paddingTopChanged')
       );
 
@@ -379,7 +406,7 @@ class UIWrapper implements IUIWrapper {
     if (value != _paddingBottom) {
       _paddingBottom = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('paddingBottomChanged')
       );
 
@@ -398,11 +425,40 @@ class UIWrapper implements IUIWrapper {
     if (value != _layout) {
       _layout = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent('layoutChanged')
       );
 
       invalidateProperties();
+    }
+  }
+  
+  //---------------------------------
+  // inheritsDefaultCSS
+  //---------------------------------
+
+  bool _inheritsDefaultCSS = true;
+
+  bool get inheritsDefaultCSS => _inheritsDefaultCSS;
+  set inheritsDefaultCSS(bool value) {
+    if (value != _inheritsDefaultCSS) {
+      _inheritsDefaultCSS = value;
+      
+      if (_isInitialized) {
+        if (value) {
+          _reflowManager.postRendering.whenComplete(
+            () => _control.classes.add('_' + _className)
+          );
+        } else {
+          _reflowManager.postRendering.whenComplete(
+              () => _control.classes.remove('_' + _className)
+          );
+        }
+      }
+
+      notify(
+        new FrameworkEvent('inheritsDefaultCSSChanged')
+      );
     }
   }
 
@@ -451,6 +507,14 @@ class UIWrapper implements IUIWrapper {
   String _elementId;
 
   String get elementId => _elementId;
+  
+  //---------------------------------
+  // className
+  //---------------------------------
+
+  String _className = 'UIWrapper';
+
+  String get className => _className;
 
   //---------------------------------
   // control
@@ -481,20 +545,20 @@ class UIWrapper implements IUIWrapper {
   //
   //---------------------------------
 
-  bool hasEventListener(String type, Function eventHandler) {
-    return _eventDispatcher.hasEventListener(type, eventHandler);
+  bool hasObserver(String type) {
+    return _eventDispatcher.hasObserver(type);
   }
 
-  void addEventListener(String type, Function eventHandler) {
-    _eventDispatcher.addEventListener(type, eventHandler);
+  void observe(String type, Function eventHandler) {
+    _eventDispatcher.observe(type, eventHandler);
   }
 
-  void removeEventListener(String type, Function eventHandler) {
-    _eventDispatcher.removeEventListener(type, eventHandler);
+  void ignore(String type, Function eventHandler) {
+    _eventDispatcher.ignore(type, eventHandler);
   }
 
-  void dispatch(FrameworkEvent event) {
-    _eventDispatcher.dispatch(event);
+  void notify(FrameworkEvent event) {
+    _eventDispatcher.notify(event);
   }
 
   //---------------------------------
@@ -503,13 +567,19 @@ class UIWrapper implements IUIWrapper {
   //
   //---------------------------------
 
-  void operator []=(String type, Function eventHandler) => addEventListener(type, eventHandler);
+  void operator []=(String type, Function eventHandler) => observe(type, eventHandler);
 
   //---------------------------------
   //
   // Public methods
   //
   //---------------------------------
+  
+  void preInitialize(IUIWrapper forOwner) {
+    _reflowManager = new ReflowManager();
+    _owner = forOwner;
+    _initialize();
+  }
 
   void invalidateProperties() {
     if (!_isLayoutUpdateRequired) {
@@ -535,42 +605,54 @@ class UIWrapper implements IUIWrapper {
       } else {
         _addLaterElements.add(element);
       }
-
-      this['controlChanged'] = ((FrameworkEvent event) => _addAllPendingElements());
     } else {
-      _children.addLast(element);
-      
       final UIWrapper elementCast = element as UIWrapper;
 
       elementCast._reflowManager = _reflowManager;
       elementCast._owner = this;
       elementCast._initialize();
-
-      if (prepend) {
-        final List<Element> newElementList = new List<Element>();
-
-        newElementList.add(element.control);
-        newElementList.addAll(_owner.control.children);
-        
-        _owner.control.children.removeAll(_owner.control.children);
-        
-        _owner.control.children.addAll(newElementList);
+      
+      if (_elementId != null) {
+        if (prepend) {
+          new Timer(
+              new Duration(milliseconds: 250), 
+              () => _control.children.insert(0, element.control)
+          );
+        } else {
+          new Timer(
+              new Duration(milliseconds: 250), 
+              () => _control.append(element.control)
+          );
+        }
       } else {
-        _reflowManager.currentNextInterval.whenComplete(
-            () {
-              _control.append(element.control);
-            }
-        );
+        if (prepend) {
+          _reflowManager.postRendering.whenComplete(
+              () => _control.children.insert(0, element.control)
+          );
+        } else {
+          _reflowManager.postRendering.whenComplete(
+              () => _control.append(element.control)
+          );
+        }
       }
 
       invalidateProperties();
+      
+      _children.add(element);
     }
   }
 
   void remove(IUIWrapper element) {
-    _children.removeMatching((IUIWrapper child) => (child == element));
-    _addLaterElements.removeMatching((IUIWrapper child) => (child == element));
+    if (
+        (_control != null) &&
+        _control.contains(element.control)
+    ) {
+      _control.children.remove(element.control);
+    }
     
+    _children.removeWhere((IUIWrapper child) => (child == element));
+    _addLaterElements.removeWhere((IUIWrapper child) => (child == element));
+
     element.removeAll();
   }
 
@@ -594,11 +676,25 @@ class UIWrapper implements IUIWrapper {
 
   void _setControl(Element element) {
     _control = element;
+    
+    if (_inheritsDefaultCSS) {
+      _reflowManager.postRendering.then(
+          (_) {
+            _control.classes.add('_' + _className);
+          }
+      );
+    }
+    
+    if (_classes != null) {
+      _reflowManager.postRendering.then(
+          (_) => _control.classes.addAll(_classes)
+      );
+    }
 
     _updateVisibility();
     _updateControl(5);
 
-    dispatch(
+    notify(
       new FrameworkEvent(
           'controlChanged',
           relatedObject: element
@@ -606,22 +702,26 @@ class UIWrapper implements IUIWrapper {
     );
 
     invalidateProperties();
+    
+    _addAllPendingElements();
   }
 
   void _updateControl(int type) {
     if (_control != null) {
       if (_elementId == null) {
+        final String cssWidth = (_width == 0) ? 'auto' : _width.toString() + 'px';
+        final String cssHeight = (_height == 0) ? 'auto' : _height.toString() + 'px';
 
         switch (type) {
-          case 1 : _reflowManager.invalidateCSS(_control, 'left', '${_x}px'); break;
-          case 2 : _reflowManager.invalidateCSS(_control, 'top', '${_y}px'); break;
-          case 3 : _reflowManager.invalidateCSS(_control, 'width', '${_width}px'); break;
-          case 4 : _reflowManager.invalidateCSS(_control, 'height', '${_height}px'); break;
+          case 1 : _reflowManager.invalidateCSS(_control, 'left', _x.toString() + 'px');          break;
+          case 2 : _reflowManager.invalidateCSS(_control, 'top', _y.toString() + 'px');           break;
+          case 3 : _reflowManager.invalidateCSS(_control, 'width', cssWidth);                     break;
+          case 4 : _reflowManager.invalidateCSS(_control, 'height', cssHeight);                   break;
           case 5 :
-            _reflowManager.invalidateCSS(_control, 'left', '${_x}px');
-            _reflowManager.invalidateCSS(_control, 'top', '${_y}px');
-            _reflowManager.invalidateCSS(_control, 'width', '${_width}px');
-            _reflowManager.invalidateCSS(_control, 'height', '${_height}px');
+            _reflowManager.invalidateCSS(_control, 'left', _x.toString() + 'px');
+            _reflowManager.invalidateCSS(_control, 'top', _y.toString() + 'px');
+            _reflowManager.invalidateCSS(_control, 'width', cssWidth);
+            _reflowManager.invalidateCSS(_control, 'height', cssHeight);
 
             break;
         }
@@ -635,7 +735,7 @@ class UIWrapper implements IUIWrapper {
   void _wrapDOMTarget() {
     if (_elementId != null) {
       _control = query(_elementId);
-      _reflowManager = UpdateManager.reflowManager;
+      _reflowManager = new ReflowManager();
 
       window.$dom_addEventListener('resize', _invalidateSize, true);
 
@@ -648,6 +748,12 @@ class UIWrapper implements IUIWrapper {
       _isInitialized = true;
 
       _createChildren();
+      
+      notify(
+          new FrameworkEvent(
+              'initializationComplete'
+          )
+      );
 
       invalidateProperties();
     }
@@ -657,6 +763,14 @@ class UIWrapper implements IUIWrapper {
   }
 
   void _commitProperties() {
+    if (_isClassesChanged) {
+      _isClassesChanged = false;
+      
+      if (_control != null) {
+        _control.classes.addAll(_classes);
+      }
+    }
+    
     if (_isLayoutUpdateRequired) {
       _isLayoutUpdateRequired = false;
 
@@ -685,14 +799,12 @@ class UIWrapper implements IUIWrapper {
         );
       } else {
         IUIWrapper element;
-        
+
         _children.forEach(
           (element) {
-            element.x = _x;
-            element.y = _y;
             element.width = _width;
             element.height = _height;
-          }    
+          }
         );
       }
     }
@@ -707,8 +819,8 @@ class UIWrapper implements IUIWrapper {
   }
 
   void _updateSize() {
-    width = _control.clientWidth;
-    height = _control.clientHeight;
+    width = _control.client.width;
+    height = _control.client.height;
   }
 
   void _updateVisibility() {
@@ -724,11 +836,11 @@ class UIWrapper implements IUIWrapper {
   }
 
   void _addAllPendingElements() {
-    _eventDispatcher.removeEventListener(
+    _eventDispatcher.ignore(
         'controlChanged',
         _addAllPendingElements
     );
-
+    
     _addLaterElements.forEach(
         (element) => add(element)
     );

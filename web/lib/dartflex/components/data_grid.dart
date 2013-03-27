@@ -1,4 +1,4 @@
-part of dartflex.components;
+part of dartflex;
 
 class DataGrid extends ListWrapper {
 
@@ -31,7 +31,7 @@ class DataGrid extends ListWrapper {
   set columns(ListCollection value) {
     if (value != _columns) {
       if (_columns != null) {
-        _columns.removeEventListener(
+        _columns.ignore(
             CollectionEvent.COLLECTION_CHANGED,
             _columns_collectionChangedHandler
         );
@@ -41,13 +41,13 @@ class DataGrid extends ListWrapper {
       _isColumnsChanged = true;
 
       if (value != null) {
-        value.addEventListener(
+        value.observe(
             CollectionEvent.COLLECTION_CHANGED,
             _columns_collectionChangedHandler
         );
       }
 
-      dispatch(
+      notify(
         new FrameworkEvent(
           'columnsChanged'
         )
@@ -68,7 +68,7 @@ class DataGrid extends ListWrapper {
     if (value != _headerHeight) {
       _headerHeight = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent(
           'headerHeightChanged'
         )
@@ -89,7 +89,7 @@ class DataGrid extends ListWrapper {
     if (value != _rowHeight) {
       _rowHeight = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent(
           'rowHeightChanged'
         )
@@ -110,7 +110,7 @@ class DataGrid extends ListWrapper {
     if (value != _columnSpacing) {
       _columnSpacing = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent(
           'columnSpacingChanged'
         )
@@ -131,9 +131,32 @@ class DataGrid extends ListWrapper {
     if (value != _rowSpacing) {
       _rowSpacing = value;
 
-      dispatch(
+      notify(
         new FrameworkEvent(
           'rowSpacingChanged'
+        )
+      );
+
+      invalidateProperties();
+    }
+  }
+  
+  //---------------------------------
+  // useSelectionEffects
+  //---------------------------------
+
+  bool _useSelectionEffects = true;
+  bool _isUseSelectionEffectsChanged = false;
+
+  bool get useSelectionEffects => _useSelectionEffects;
+  set useSelectionEffects(bool value) {
+    if (value != _useSelectionEffects) {
+      _useSelectionEffects = value;
+      _isUseSelectionEffectsChanged = true;
+
+      notify(
+        new FrameworkEvent(
+          'useSelectionEffectsChanged'
         )
       );
 
@@ -148,6 +171,7 @@ class DataGrid extends ListWrapper {
   //---------------------------------
 
   DataGrid() : super(elementId: null) {
+	_className = 'DataGrid';
   }
 
   //---------------------------------
@@ -181,7 +205,8 @@ class DataGrid extends ListWrapper {
     ..rowSpacing = _rowSpacing
     ..rowHeight = _rowHeight
     ..dataProvider = _dataProvider
-    ..itemRendererFactory = new ClassFactory(constructorMethod: DataGridItemRenderer.construct);
+    ..itemRendererFactory = new ClassFactory(constructorMethod: DataGridItemRenderer.construct)
+    ..useSelectionEffects = _useSelectionEffects;
 
     _gridContainer.add(_headerContainer);
     _gridContainer.add(_list);
@@ -191,14 +216,14 @@ class DataGrid extends ListWrapper {
     _setControl(container);
 
     _reflowManager.invalidateCSS(container, 'border', '1px solid #808080');
-    _reflowManager.invalidateCSS(container, 'backgroundColor', '#cccccc');
+    _reflowManager.invalidateCSS(container, 'background-color', '#cccccc');
 
-    _list.addEventListener(
+    _list.observe(
       'rendererAdded',
       _list_rendererAddedHandler
     );
 
-    _list.addEventListener(
+    _list.observe(
         'scrollChanged',
         _list_scrollChangedHandler
     );
@@ -214,14 +239,24 @@ class DataGrid extends ListWrapper {
 
       _updateColumnsAndHeaders();
     }
+    
+    if (_isUseSelectionEffectsChanged) {
+      _isUseSelectionEffectsChanged = false;
+      
+      if (_list != null) {
+        _list.useSelectionEffects = _useSelectionEffects;
+      }
+    }
   }
 
   void _removeAllElements() {
     if (_headerItemRenderers != null) {
       _headerItemRenderers.removeAll(_headerItemRenderers);
     }
-
-    _headerContainer.removeAll();
+    
+    if (_headerContainer != null) {
+      _headerContainer.removeAll();
+    }
   }
 
   void _updateElements() {
@@ -231,6 +266,10 @@ class DataGrid extends ListWrapper {
   }
 
   void _updateColumnsAndHeaders() {
+    if (_headerContainer == null) {
+      return;
+    }
+    
     DataGridColumn column;
     DataGridItemRenderer renderer;
     IItemRenderer header;
@@ -243,15 +282,6 @@ class DataGrid extends ListWrapper {
     if (_columns != null) {
       len = _columns.length;
 
-      column = _columns[0] as DataGridColumn;
-
-      // TO_DO: shouldn't be a need to have a 2px spacer here
-      header = column.headerItemRendererFactory.immediateInstance()
-        ..width = 2
-        ..height = _headerHeight;
-
-      _headerContainer.add(header);
-      
       for (i=0; i<len; i++) {
         column = _columns[i] as DataGridColumn;
 
@@ -277,7 +307,7 @@ class DataGrid extends ListWrapper {
           (renderer) {
             renderer.gap = _columnSpacing;
             renderer.columns = _columns;
-          }    
+          }
         );
       }
     }
@@ -291,7 +321,7 @@ class DataGrid extends ListWrapper {
     }
 
     final bool isAscSort = event.relatedObject['isAscSort'];
-
+    
     _dataProvider.sort(
         (Map itemA, Map itemB) {
           if (isAscSort) {
@@ -313,7 +343,7 @@ class DataGrid extends ListWrapper {
       int tw = 0;
       int remainingWidth = 0;
       double procCount = .0;
-      
+
       while (i > 0) {
         column = _columns[--i];
 
@@ -367,8 +397,12 @@ class DataGrid extends ListWrapper {
 
   void _list_scrollChangedHandler(FrameworkEvent event) {
     final Element scrollTarget = event.relatedObject as Element;
-
-    _headerContainer.x = -scrollTarget.scrollLeft;
+    
+    _reflowManager.scheduleMethod(this, _updateHeaderContainerPosition, []);
+  }
+  
+  void _updateHeaderContainerPosition() { 
+    _headerContainer.x = -_list._control.scrollLeft;
   }
 
   void _columns_collectionChangedHandler(FrameworkEvent event) {

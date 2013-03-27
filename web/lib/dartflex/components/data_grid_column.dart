@@ -1,4 +1,4 @@
-part of dartflex.components;
+part of dartflex;
 
 class DataGridColumn {
 
