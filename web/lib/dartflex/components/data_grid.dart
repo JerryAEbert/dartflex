@@ -215,17 +215,9 @@ class DataGrid extends ListWrapper {
 
     _setControl(container);
 
-    _reflowManager.invalidateCSS(container, 'border', '1px solid #808080');
-    _reflowManager.invalidateCSS(container, 'background-color', '#cccccc');
-
     _list.observe(
       'rendererAdded',
       _list_rendererAddedHandler
-    );
-
-    _list.observe(
-        'scrollChanged',
-        _list_scrollChangedHandler
     );
 
     super._createChildren();
@@ -246,6 +238,22 @@ class DataGrid extends ListWrapper {
       if (_list != null) {
         _list.useSelectionEffects = _useSelectionEffects;
       }
+    }
+  }
+  
+  void _updateScrollPolicy() {
+    super._updateScrollPolicy();
+    
+    if (_horizontalScrollPolicy == ScrollPolicy.NONE) {
+      _list.ignore(
+          'scrollChanged',
+          _list_scrollChangedHandler
+      );
+    } else {
+      _list.observe(
+          'scrollChanged',
+          _list_scrollChangedHandler
+      );
     }
   }
 
@@ -395,13 +403,9 @@ class DataGrid extends ListWrapper {
     invalidateProperties();
   }
 
-  void _list_scrollChangedHandler(FrameworkEvent event) {
-    final Element scrollTarget = event.relatedObject as Element;
-    
-    _reflowManager.scheduleMethod(this, _updateHeaderContainerPosition, []);
-  }
+  void _list_scrollChangedHandler(FrameworkEvent event) => _reflowManager.scheduleMethod(this, _updateHeaderContainerPosition, []);
   
-  void _updateHeaderContainerPosition() { 
+  void _updateHeaderContainerPosition() {
     _headerContainer.x = -_list._control.scrollLeft;
   }
 

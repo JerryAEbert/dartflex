@@ -29,31 +29,20 @@ class UpdateManager {
 
   void operator >(Function handler) {
     final String fncToString = handler.toString();
-    int i;
 
     if (fncToString == 'Closure') {
       // JavaScript path
-      i = _pendingHandlersJS.length;
-
-      while (i > 0) {
-        if (_pendingHandlersJS[--i] == handler) {
-          return;
-        }
+      if (
+          _pendingHandlersJS.contains(handler)
+      ) {
+        return;
       }
 
       _pendingHandlersJS.add(handler);
 
-      _reflowManager.preRendering.then(
+      _reflowManager.postRendering.then(
           (_) {
-            i = _pendingHandlersJS.length;
-
-            while (i > 0) {
-              if (_pendingHandlersJS[--i] == handler) {
-                _pendingHandlersJS.removeAt(i);
-
-                break;
-              }
-            }
+            _pendingHandlersJS.remove(handler);
 
             handler();
           }
@@ -68,7 +57,7 @@ class UpdateManager {
 
       _pendingHandlers[fncToString] = true;
 
-      _reflowManager.preRendering.then(
+      _reflowManager.postRendering.then(
           (_) {
             _pendingHandlers.remove(fncToString);
 

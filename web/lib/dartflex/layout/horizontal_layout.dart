@@ -99,15 +99,15 @@ class HorizontalLayout implements ILayout {
       
       if (element.includeInLayout) {
         if (element.percentWidth > 0.0) {
-          w = (element.percentWidth * .01 * (percWidth - _gap * (sx - 1)) / sx).toInt();
+          w = (element.percentWidth * .01 * (percWidth - _gap * (sx - 1)) / sx).toInt() - element.paddingLeft - element.paddingRight;
         } else if (element.width > 0) {
-          w = element.width;
+          w = element.width - element.paddingLeft - element.paddingRight;
         }
 
         if (element.percentHeight > 0) {
-          h = (height * element.percentHeight * .01).toInt();
+          h = (height * element.percentHeight * .01).toInt() - element.paddingTop - element.paddingBottom;
         } else if (element.height > 0) {
-          h = element.height;
+          h = element.height - element.paddingTop - element.paddingBottom;
         }
 
         w = (w == null) ? 0 : w;
@@ -120,14 +120,14 @@ class HorizontalLayout implements ILayout {
           if (_align == 'left') {
             element.x = offset + element.paddingLeft;
           } else if (_align == 'right') {
-            element.x = width - offset - element.paddingLeft - element.width;
+            element.x = width - offset - element.paddingLeft - - element.paddingRight - element.width;
           }
         } else {
-          element.x = 0;
+          element.x = element.paddingLeft;
         }
 
         if (_constrainToBounds) {
-          element.y = (height * .5 - h * .5).toInt();
+          element.y = (height * .5 - h * .5).toInt() + element.paddingTop;
         }
 
         if (element.autoSize) {
@@ -140,8 +140,8 @@ class HorizontalLayout implements ILayout {
 
         offset += w + _gap + element.paddingLeft + element.paddingRight;
       } else {
-        element.x = 0;
-        element.y = 0;
+        element.x = element.paddingLeft;
+        element.y = element.paddingTop;
       }
     }
   }

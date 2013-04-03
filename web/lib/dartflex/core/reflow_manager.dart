@@ -16,7 +16,7 @@ class ReflowManager {
   bool _hasCommittedAllScheduledHandlers = false;
   bool _hasCommittedAllPendingCSSProperties = false;
 
-  final Element _detachedElement = new HtmlElement();
+  final HtmlElement _detachedElement = new HtmlElement();
 
   //---------------------------------
   // preRendering
@@ -56,7 +56,15 @@ class ReflowManager {
   // Singleton
   //---------------------------------
 
-  ReflowManager._construct();
+  ReflowManager._construct() {
+    window.onMessage.listen(
+        (Event event) {
+          _preCompleter.complete();
+          
+          _preCompleter = null;
+        }    
+    );
+  }
 
   factory ReflowManager() {
     if (_instance == null) {
@@ -165,8 +173,8 @@ class ReflowManager {
 
   void _commitAllPendingCSSProperties(_) {
     ElementCSSMap elementCSSMap;
+    String cssCache;
     int i = _elements.length;
-    bool hasUpdate;
     
     _hasCommittedAllPendingCSSProperties = false;
     
@@ -175,21 +183,15 @@ class ReflowManager {
     while (i > 0) {
       elementCSSMap = _elements[--i];
       
-      _detachedElement.style.cssText = elementCSSMap.element.style.cssText;
+      cssCache = elementCSSMap.element.style.cssText;
       
-      hasUpdate = false;
+      _detachedElement.style.cssText = cssCache;
 
       elementCSSMap.cssDecl.forEach(
-          (String propertyName, String value) {
-            if (_detachedElement.style.getPropertyValue(propertyName) != value) {
-              hasUpdate = true;
-              
-              _detachedElement.style.setProperty(propertyName, value, '');
-            }
-          }
+          (String propertyName, String value) => _detachedElement.style.setProperty(propertyName, value, '')
       );
-
-      if (hasUpdate) {
+      
+      if (cssCache != _detachedElement.style.cssText) {
         elementCSSMap.element.style.cssText = _detachedElement.style.cssText;
       }
       
@@ -199,34 +201,22 @@ class ReflowManager {
     _postRendering = null;
   }
   
+  Completer _preCompleter;
+  
   Future _requestPreRenderingSlot() {
-    final Completer completer = new Completer();
-    
-    window.requestAnimationFrame(
-        (_) => completer.complete()
-    );
-
-    return completer.future;
-  }
-  
-  Completer _postCompleter;
-  
-  Future _requestPostRenderingSlot() {
-    if (_postCompleter != null) {
-      return _postCompleter.future;
+    if (_preCompleter != null) {
+      return _preCompleter.future;
     }
     
-    _postCompleter = new Completer();
+    _preCompleter = new Completer();
     
-    window.setImmediate(
-        () {
-          _postCompleter.complete();
-          
-          _postCompleter = null;
-        }
-    );
+    window.postMessage('*', '*');
 
-    return _postCompleter.future;
+    return _preCompleter.future;
+  }
+  
+  Future _requestPostRenderingSlot() {
+    return window.animationFrame;
   }
 }
 

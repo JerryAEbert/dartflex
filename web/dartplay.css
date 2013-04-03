@@ -57,9 +57,11 @@ html,body {
   background: -o-linear-gradient(top, #ffffff, #dddddd);
 }
  
-/*._ListRenderer {
+._ListRenderer {
   -webkit-overflow-scrolling: touch;
-}*/
+  border: 1px solid rgb(128, 128, 128);
+  background-color: rgb(255, 255, 255);
+}
 
 ._Button {
   -webkit-transition: color 0.7s ease-in-out;
@@ -120,6 +122,24 @@ html,body {
   border: 0;
   display:block;
   background:url(http://www.igindo.com/dart/m/gear.png) 0 0 no-repeat;
+}
+
+._ViewStackSlider {
+  transition: left .75s ease-out;
+  -moz-transition: left .75s ease-out;
+  -webkit-transition: left .75s ease-out;
+  -o-transition: left .75s ease-out;
+  -ms-transition: left .75s ease-out;
+  transitionDelay: .6s;
+  -moz-transitionDelay: .6s;
+  -webkit-transitionDelay: .6s;
+  -o-transitionDelay: .6s;
+  -ms-transitionDelay: .6s;
+}
+
+._DataGrid {
+  border: 1px solid #808080;
+  background-color: #cccccc;
 }
 
 ._DataGridItemRenderer {

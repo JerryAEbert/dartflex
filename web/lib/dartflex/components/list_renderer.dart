@@ -325,9 +325,6 @@ class ListRenderer extends ListWrapper {
 
     _setControl(container);
 
-    _reflowManager.invalidateCSS(container, 'border', '1px solid rgb(128, 128, 128)');
-    _reflowManager.invalidateCSS(container, 'background-color', 'rgb(255, 255, 255)');
-
     super._createChildren();
   }
 
@@ -518,26 +515,25 @@ class ListRenderer extends ListWrapper {
   }
 
   void _updateVisibleItemRenderers() {
-    final List<IUIWrapper> newChildren = new List<IUIWrapper>();
-    final List<Element> elementsToSort = new List<Element>();
     final int dpLen = _dataProvider.length;
     final int firstIndex = _scrollPosition ~/ _getPageItemSize();
     final int irLen = _itemRenderers.length;
     final int len = firstIndex + irLen;
 
-    dynamic data, actualData;
-    IItemRenderer renderer;
+    dynamic data;
+    IItemRenderer rendererA, rendererB;
+    bool isRendererShown;
     int rendererIndex = 0;
-    int i;
+    int i, sortIndexA, sortIndexB;
 
     //
     // START: sort the renderers, this will minimize the amount of updates needed when recycling
     //
 
     _itemRenderers.sort(
-      (IItemRenderer rendererA, IItemRenderer rendererB) {
-        int sortIndexA = rendererA.index - firstIndex;
-        int sortIndexB = rendererB.index - firstIndex;
+      (rendererA, rendererB) {
+        sortIndexA = rendererA.index - firstIndex;
+        sortIndexB = rendererB.index - firstIndex;
 
         if (sortIndexA >= irLen) {
           sortIndexA = -sortIndexA;
@@ -551,42 +547,36 @@ class ListRenderer extends ListWrapper {
           sortIndexB += 1000000;
         }
 
-        return sortIndexA.compareTo(sortIndexB);
+        return (sortIndexA < sortIndexB) ? -1 : (sortIndexA > sortIndexB) ? 1 : 0;
       }
     );
-
-    for (i=0; i<irLen; i++) {
-      newChildren.add(_itemRenderers[i]);
-    }
-
-    _children.removeAll(newChildren);
-    _children.addAll(newChildren);
+    
+    _children = _itemRenderers.sublist(0);
 
     //
     // END
     //
 
     for (i=firstIndex; i<len; i++) {
-      renderer = _itemRenderers[rendererIndex++]
-        ..index = i;
-
-      _updateRenderer(renderer);
-
-      if (i < dpLen) {
-        data = _dataProvider[i];
-
-        renderer.includeInLayout = true;
-        renderer.visible = true;
-        renderer.selected = (i == _selectedIndex);
-      } else {
-        renderer.includeInLayout = false;
-        renderer.visible = false;
-        renderer.selected = false;
-
-        data = null;
-      }
+      isRendererShown = (i < dpLen);
       
-      renderer.data = ((_labelFunction != null) && (data != null)) ? _labelFunction(data) : data;
+      data = isRendererShown ? _dataProvider[i] : null;
+      
+      if (
+        (data != null) &&
+        (_labelFunction != null)
+      ) {
+        data = _labelFunction(data);
+      }
+
+      _updateRenderer(
+        _itemRenderers[rendererIndex++]
+        ..index = i
+        ..includeInLayout = isRendererShown
+        ..visible = isRendererShown
+        ..selected = (i == _selectedIndex)
+        ..data = data    
+      );
     }
   }
 
@@ -623,19 +613,21 @@ class ListRenderer extends ListWrapper {
     selectedItem = newSelectedItem;
   }
 
-  void _container_scrollHandler(Event event) => _reflowManager.scheduleMethod(this, _updateScrollPosition, []);
+  void _container_scrollHandler(Event event) => _reflowManager.scheduleMethod(this, _updateScrollPosition, [(_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft]);
   
-  void _updateScrollPosition() {
+  void _updateScrollPosition(int position) {
     _hasScrolled = true;
     
-    scrollPosition = (_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft;
-    
-    notify(
-        new FrameworkEvent(
-            'scrollChanged',
-            relatedObject: _control
-        )
-    );
+    if (position != _scrollPosition) {
+      scrollPosition = position;
+      
+      notify(
+          new FrameworkEvent(
+              'scrollChanged',
+              relatedObject: _control
+          )
+      );
+    }
   }
 
   void _dataProvider_collectionChangedHandler(FrameworkEvent event) {

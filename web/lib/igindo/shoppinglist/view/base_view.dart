@@ -135,11 +135,7 @@ class BaseView extends VGroup {
     
     _toggleRowSizeButton.observe(
         'click', 
-        (FrameworkEvent event) { 
-          _grid.rowHeight = (_grid.rowHeight == 50) ? 200 : 50;
-          
-          _grid.columns = _grid.columns.reverse();
-        }
+        (FrameworkEvent event) => _grid.rowHeight = (_grid.rowHeight == 60) ? 200 : 60
     );
     
     _footer.add(_toggleRowSizeButton);

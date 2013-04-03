@@ -15,11 +15,11 @@ class IndividualList extends BaseView {
     ..percentWidth = 100.0
     ..percentHeight = 100.0
     ..headerHeight = 40
-    ..rowHeight = 50
+    ..rowHeight = 60
     ..columnSpacing = 0
     ..rowSpacing = 0
     ..useSelectionEffects = false
-    ..dataProvider = createDataProvider(dpLen: 100)
+    ..dataProvider = createDataProvider(dpLen: 1000)
     ..columns = new ListCollection(
         source: [
                  new DataGridColumn()

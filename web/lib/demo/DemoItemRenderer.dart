@@ -158,8 +158,8 @@ class ProductItemRenderer extends ItemRenderer {
     _label = new EditableText()
     ..percentWidth = 100.0
     ..percentHeight = 100.0
-    ..paddingLeft = 3
-    ..paddingRight = 3
+    ..paddingBottom = 5
+    ..paddingRight = 1
     ..text = (data != null) ? data['product'] : '';
 
     add(_label);
@@ -289,7 +289,6 @@ class TagItemRenderer extends ItemRenderer {
     _dropdown = new ComboBox()
     ..percentWidth = 100.0
     ..percentHeight = 100.0
-    ..paddingLeft = 3
     ..dataProvider = dataProvider
     ..selectedItem = data['tag'];
 

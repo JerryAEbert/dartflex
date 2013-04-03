@@ -7,9 +7,6 @@ class EditableText extends UIWrapper {
   // Private properties
   //
   //---------------------------------
-  
-  bool _isWidthAutoScaled = false;
-  bool _isHeightAutoScaled = false;
 
   //---------------------------------
   //
@@ -105,7 +102,7 @@ class EditableText extends UIWrapper {
   void _createChildren() {
     super._createChildren();
     
-    TextAreaElement label = new TextAreaElement();
+    TextInputElement label = new TextInputElement();
     
     _autoSize = true;
 
@@ -114,8 +111,6 @@ class EditableText extends UIWrapper {
     _commitTextAlign();
     _commitTextVerticalAlign();
     _commitText();
-
-    _reflowManager.invalidateCSS(_control, 'overflow', 'hidden');
   }
 
   void _commitTextAlign() {
@@ -132,69 +127,18 @@ class EditableText extends UIWrapper {
 
   void _commitText() {
     if (_control != null) {
-      _reflowManager.scheduleMethod(this, _commitTextOnReflow, []);
+      _reflowManager.postRendering.whenComplete(_commitTextOnReflow);
     }
   }
   
   void _commitTextOnReflow() {
     final String newText = (_text != null) ? _text : '';
+    final TextInputElement controlCast = _control as TextInputElement;
     
-    if (newText == _control.text) {
+    if (newText == controlCast.value) {
       return;
     }
     
-    _control.text = newText;
-    
-    if (
-        _isWidthAutoScaled ||
-        (
-          (_width == 0) &&
-          (_percentWidth == .0)
-        )
-    ) {
-      _isWidthAutoScaled = true;
-      
-      _reflowManager.postRendering.whenComplete(_updateWidth);
-    }
-    
-    if (
-        _isHeightAutoScaled ||
-        (
-          (_height == 0) &&
-          (_percentHeight == .0)
-        )
-    ) {
-      _isHeightAutoScaled = true;
-      
-      _reflowManager.postRendering.whenComplete(_updateHeight);
-    }
-  }
-  
-  void _updateWidth() {
-    final int newWidth = _control.client.width;
-    
-    if (newWidth > 0) {
-      if (newWidth != _width) {
-        width = newWidth;
-      
-        _owner.invalidateProperties();
-      }
-    } else {
-      _reflowManager.postRendering.whenComplete(_updateWidth);
-    }
-  }
-  
-  void _updateHeight() {
-    final int newHeight = _control.client.height;
-    
-    if (newHeight > 0) {
-      if (newHeight != _height) {
-        height = newHeight;
-        
-        _owner.invalidateProperties();
-      }
-    } else {
-      _reflowManager.postRendering.whenComplete(_updateHeight);
-    }
+    controlCast.value = newText;
   }
 }

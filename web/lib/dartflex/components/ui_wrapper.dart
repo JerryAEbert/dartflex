@@ -650,8 +650,8 @@ class UIWrapper implements IUIWrapper {
       _control.children.remove(element.control);
     }
     
-    _children.removeWhere((IUIWrapper child) => (child == element));
-    _addLaterElements.removeWhere((IUIWrapper child) => (child == element));
+    _children.remove(element);
+    _addLaterElements.remove(element);
 
     element.removeAll();
   }
@@ -709,17 +709,19 @@ class UIWrapper implements IUIWrapper {
   void _updateControl(int type) {
     if (_control != null) {
       if (_elementId == null) {
+        final String cssX = _x.toString() + 'px';
+        final String cssY = _y.toString() + 'px';
         final String cssWidth = (_width == 0) ? 'auto' : _width.toString() + 'px';
         final String cssHeight = (_height == 0) ? 'auto' : _height.toString() + 'px';
 
         switch (type) {
-          case 1 : _reflowManager.invalidateCSS(_control, 'left', _x.toString() + 'px');          break;
-          case 2 : _reflowManager.invalidateCSS(_control, 'top', _y.toString() + 'px');           break;
-          case 3 : _reflowManager.invalidateCSS(_control, 'width', cssWidth);                     break;
-          case 4 : _reflowManager.invalidateCSS(_control, 'height', cssHeight);                   break;
+          case 1 : _reflowManager.invalidateCSS(_control, 'left', cssX);        break;
+          case 2 : _reflowManager.invalidateCSS(_control, 'top', cssY);         break;
+          case 3 : _reflowManager.invalidateCSS(_control, 'width', cssWidth);   break;
+          case 4 : _reflowManager.invalidateCSS(_control, 'height', cssHeight); break;
           case 5 :
-            _reflowManager.invalidateCSS(_control, 'left', _x.toString() + 'px');
-            _reflowManager.invalidateCSS(_control, 'top', _y.toString() + 'px');
+            _reflowManager.invalidateCSS(_control, 'left', cssX);
+            _reflowManager.invalidateCSS(_control, 'top', cssY);
             _reflowManager.invalidateCSS(_control, 'width', cssWidth);
             _reflowManager.invalidateCSS(_control, 'height', cssHeight);
 
@@ -802,8 +804,10 @@ class UIWrapper implements IUIWrapper {
 
         _children.forEach(
           (element) {
-            element.width = _width;
-            element.height = _height;
+            element.x = element.paddingLeft;
+            element.y = element.paddingRight;
+            element.width = _width - element.paddingLeft - element.paddingRight;
+            element.height = _height - element.paddingTop - element.paddingBottom;
           }
         );
       }

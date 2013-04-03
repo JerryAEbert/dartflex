@@ -165,9 +165,10 @@ class ViewStack extends UIWrapper {
     
     _layout = new AbsoluteLayout();
     
-    _container = new Group();
-    
-    _container._layout = new AbsoluteLayout();
+    _container = new Group()
+    ..inheritsDefaultCSS = false
+    ..classes = ['_ViewStackSlider']
+    .._layout = new AbsoluteLayout();
     
     _reflowManager.invalidateCSS(
         _container._control,
@@ -178,9 +179,6 @@ class ViewStack extends UIWrapper {
     super.add(_container);
     
     _container.control.onTransitionEnd.listen(_container_transitionEndHandler);
-    
-    _container.control.style.transition = 'left .75s ease-out';
-    _container.control.style.transitionDelay = '.6s';
 
     super._createChildren();
   }

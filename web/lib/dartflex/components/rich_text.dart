@@ -132,7 +132,7 @@ class RichText extends UIWrapper {
 
   void _commitText() {
     if (_control != null) {
-      _reflowManager.scheduleMethod(this, _commitTextOnReflow, []);
+      _reflowManager.postRendering.whenComplete(_commitTextOnReflow);
     }
   }
   
