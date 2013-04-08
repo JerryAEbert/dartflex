@@ -104,6 +104,8 @@ class EditableText extends UIWrapper {
     
     TextInputElement label = new TextInputElement();
     
+    label.onInput.listen(_label_inputHandler);
+    
     _autoSize = true;
 
     _setControl(label);
@@ -127,7 +129,7 @@ class EditableText extends UIWrapper {
 
   void _commitText() {
     if (_control != null) {
-      _reflowManager.postRendering.whenComplete(_commitTextOnReflow);
+      _reflowManager.scheduleMethod(this, _commitTextOnReflow, []);
     }
   }
   
@@ -140,5 +142,11 @@ class EditableText extends UIWrapper {
     }
     
     controlCast.value = newText;
+  }
+  
+  void _label_inputHandler(Event event) {
+    final TextInputElement label = _control as TextInputElement;
+    
+    text = label.value;
   }
 }

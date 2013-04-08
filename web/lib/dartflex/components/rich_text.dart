@@ -132,7 +132,7 @@ class RichText extends UIWrapper {
 
   void _commitText() {
     if (_control != null) {
-      _reflowManager.postRendering.whenComplete(_commitTextOnReflow);
+      _reflowManager.scheduleMethod(this, _commitTextOnReflow, []);
     }
   }
   
@@ -154,7 +154,7 @@ class RichText extends UIWrapper {
     ) {
       _isWidthAutoScaled = true;
       
-      _reflowManager.postRendering.whenComplete(_updateWidth);
+      _reflowManager.scheduleMethod(this, _updateWidth, [_control.client.width]);
     }
     
     if (
@@ -166,12 +166,12 @@ class RichText extends UIWrapper {
     ) {
       _isHeightAutoScaled = true;
       
-      _reflowManager.postRendering.whenComplete(_updateHeight);
+      _reflowManager.scheduleMethod(this, _updateHeight, [_control.client.height]);
     }
   }
   
-  void _updateWidth() {
-    final int newWidth = _control.client.width;
+  void _updateWidth(int newSize) {
+    final int newWidth = newSize;
     
     if (newWidth > 0) {
       if (newWidth != _width) {
@@ -180,12 +180,12 @@ class RichText extends UIWrapper {
         _owner.invalidateProperties();
       }
     } else {
-      _reflowManager.postRendering.whenComplete(_updateWidth);
+      _reflowManager.scheduleMethod(this, _updateWidth, [_control.client.width]);
     }
   }
   
-  void _updateHeight() {
-    final int newHeight = _control.client.height;
+  void _updateHeight(int newSize) {
+    final int newHeight = newSize;
     
     if (newHeight > 0) {
       if (newHeight != _height) {
@@ -194,7 +194,7 @@ class RichText extends UIWrapper {
         _owner.invalidateProperties();
       }
     } else {
-      _reflowManager.postRendering.whenComplete(_updateHeight);
+      _reflowManager.scheduleMethod(this, _updateHeight, [_control.client.height]);
     }
   }
 }

@@ -161,6 +161,12 @@ class ProductItemRenderer extends ItemRenderer {
     ..paddingBottom = 5
     ..paddingRight = 1
     ..text = (data != null) ? data['product'] : '';
+    
+    _label['textChanged'] = (FrameworkEvent event) {
+      if (data != null) {
+        data['product'] = _label.text;
+      }
+    };
 
     add(_label);
   }
@@ -513,6 +519,12 @@ class ToggleItemRenderer extends ItemRenderer {
     _toggle = new Toggle()
     ..width = 80
     ..height = 30;
+    
+    _toggle['isToggledChanged'] = (FrameworkEvent event) {
+      if (data != null) {
+        data['toggled'] = _toggle.isToggled;
+      }
+    };
 
     add(_toggle);
   }
@@ -522,7 +534,7 @@ class ToggleItemRenderer extends ItemRenderer {
         (data != null) &&
         (_toggle != null)
     ) {
-      //_toggle.index = data['rating'];
+      _toggle.isToggled = data['toggled'];
     }
   }
 }

@@ -12,38 +12,39 @@ class ReflowManager {
   
   List<MethodInvokationMap> _scheduledHandlers = new List<MethodInvokationMap>();
   List<ElementCSSMap> _elements = new List<ElementCSSMap>();
-  
-  bool _hasCommittedAllScheduledHandlers = false;
-  bool _hasCommittedAllPendingCSSProperties = false;
 
   final HtmlElement _detachedElement = new HtmlElement();
-
-  //---------------------------------
-  // preRendering
-  //---------------------------------
-
-  Future _preRendering;
-
-  Future get preRendering {
-    if (_preRendering == null) {
-      _preRendering = _requestPreRenderingSlot();
-    }
-
-    return _preRendering;
-  }
   
   //---------------------------------
-  // postRendering
+  //
+  // Public properties
+  //
   //---------------------------------
-
-  Future _postRendering;
-
-  Future get postRendering {
-    if (_postRendering == null) {
-      _postRendering = _requestPostRenderingSlot();
+  
+  //---------------------------------
+  // animationFrame
+  //---------------------------------
+  
+  Completer _animationFrameCompleter;
+  
+  Future<num> get animationFrame {
+    if (_animationFrameCompleter != null) {
+      return _animationFrameCompleter.future;
     }
+    
+    _animationFrameCompleter = new Completer();
+    
+    window.requestAnimationFrame(
+      (num highResTimer) => _animationFrameCompleter.complete(highResTimer)
+    );
+    
+    final Future<num> currentFuture = _animationFrameCompleter.future;
+    
+    currentFuture.whenComplete(
+        () => _animationFrameCompleter = null 
+    );
 
-    return _postRendering;
+    return currentFuture;
   }
 
   //---------------------------------
@@ -56,15 +57,7 @@ class ReflowManager {
   // Singleton
   //---------------------------------
 
-  ReflowManager._construct() {
-    window.onMessage.listen(
-        (Event event) {
-          _preCompleter.complete();
-          
-          _preCompleter = null;
-        }    
-    );
-  }
+  ReflowManager._construct();
 
   factory ReflowManager() {
     if (_instance == null) {
@@ -80,42 +73,45 @@ class ReflowManager {
   //
   //-----------------------------------
   
-  void scheduleMethod(dynamic owner, Function method, List arguments) {
+  void scheduleMethod(dynamic owner, Function method, List arguments, {bool forceSingleExecution: false}) {
     //Function.apply(method, arguments); return;
     
     MethodInvokationMap invokation;
     bool hasOccurance = false;
     int i = _scheduledHandlers.length;
+    
+    if (forceSingleExecution) {
+      while (i > 0) {
+        invokation = _scheduledHandlers[--i];
 
-    while (i > 0) {
-      invokation = _scheduledHandlers[--i];
+        if (
+            (invokation.owner == owner) &&
+            FunctionEqualityUtil.equals(invokation.method, method)
+        ) {
+          hasOccurance = true;
 
-      if (
-          (invokation.owner == owner) &&
-          FunctionEqualityUtil.equals(invokation.method, method)
-      ) {
-        hasOccurance = true;
-
-        break;
+          break;
+        }
       }
     }
     
     if (!hasOccurance) {
       invokation = new MethodInvokationMap()
       ..owner = owner
-      ..method = method
-      ..arguments = arguments;
+      ..method = method;
 
       _scheduledHandlers.add(invokation);
-    } else {
-      invokation.arguments = arguments;
     }
     
-    if (!_hasCommittedAllScheduledHandlers) {
-      _hasCommittedAllScheduledHandlers = true;
-      
-      preRendering.whenComplete(_commitAllScheduledHandlers);
-    }
+    invokation.arguments = arguments;
+    
+    animationFrame.then(
+        (_) {
+          Function.apply(invokation.method, invokation.arguments);
+          
+          _scheduledHandlers.remove(invokation);
+        }
+    );
   }
 
   void invalidateCSS(Element element, String property, String value) {
@@ -126,7 +122,7 @@ class ReflowManager {
     ElementCSSMap elementCSSMap;
     bool hasOccurance = false;
     int i = _elements.length;
-
+    
     while (i > 0) {
       elementCSSMap = _elements[--i];
 
@@ -147,76 +143,23 @@ class ReflowManager {
 
     elementCSSMap.cssDecl[property] = value;
     
-    if (!_hasCommittedAllPendingCSSProperties) {
-      _hasCommittedAllPendingCSSProperties = true;
+    animationFrame.whenComplete(
+      () {
+        final String cssCache = elementCSSMap.element.style.cssText;
+        
+        _detachedElement.style.cssText = cssCache;
 
-      postRendering.then(_commitAllPendingCSSProperties);
-    }
-  }
-  
-  void _commitAllScheduledHandlers() {
-    MethodInvokationMap invokation;
-    int i = _scheduledHandlers.length;
-    
-    _hasCommittedAllScheduledHandlers = false;
-    
-    while (i > 0) {
-      invokation = _scheduledHandlers[--i];
-      
-      Function.apply(invokation.method, invokation.arguments);
-      
-      _scheduledHandlers.removeAt(i);
-    }
-
-    _preRendering = null;
-  }
-
-  void _commitAllPendingCSSProperties(_) {
-    ElementCSSMap elementCSSMap;
-    String cssCache;
-    int i = _elements.length;
-    
-    _hasCommittedAllPendingCSSProperties = false;
-    
-    _detachedElement.hidden = true;
-    
-    while (i > 0) {
-      elementCSSMap = _elements[--i];
-      
-      cssCache = elementCSSMap.element.style.cssText;
-      
-      _detachedElement.style.cssText = cssCache;
-
-      elementCSSMap.cssDecl.forEach(
-          (String propertyName, String value) => _detachedElement.style.setProperty(propertyName, value, '')
-      );
-      
-      if (cssCache != _detachedElement.style.cssText) {
-        elementCSSMap.element.style.cssText = _detachedElement.style.cssText;
-      }
-      
-      _elements.removeAt(i);
-    }
-
-    _postRendering = null;
-  }
-  
-  Completer _preCompleter;
-  
-  Future _requestPreRenderingSlot() {
-    if (_preCompleter != null) {
-      return _preCompleter.future;
-    }
-    
-    _preCompleter = new Completer();
-    
-    window.postMessage('*', '*');
-
-    return _preCompleter.future;
-  }
-  
-  Future _requestPostRenderingSlot() {
-    return window.animationFrame;
+        elementCSSMap.cssDecl.forEach(
+            (String propertyName, String value) => _detachedElement.style.setProperty(propertyName, value, '')
+        );
+        
+        if (cssCache != _detachedElement.style.cssText) {
+          elementCSSMap.element.style.cssText = _detachedElement.style.cssText;
+        }
+        
+        _elements.remove(elementCSSMap);
+      }    
+    );
   }
 }
 

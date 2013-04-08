@@ -122,6 +122,27 @@ class UIWrapper implements IUIWrapper {
   }
   
   //---------------------------------
+  // stylePrefix
+  //---------------------------------
+
+  String _stylePrefix;
+  bool _isStylePrefixChanged = false;
+
+  String get stylePrefix => _stylePrefix;
+
+  set stylePrefix(String value) {
+    if (value != _stylePrefix) {
+      _stylePrefix = value;
+
+      notify(
+        new FrameworkEvent('stylePrefixChanged')
+      );
+
+      invalidateProperties();
+    }
+  }
+  
+  //---------------------------------
   // classes
   //---------------------------------
 
@@ -445,15 +466,7 @@ class UIWrapper implements IUIWrapper {
       _inheritsDefaultCSS = value;
       
       if (_isInitialized) {
-        if (value) {
-          _reflowManager.postRendering.whenComplete(
-            () => _control.classes.add('_' + _className)
-          );
-        } else {
-          _reflowManager.postRendering.whenComplete(
-              () => _control.classes.remove('_' + _className)
-          );
-        }
+        later > _updateDefaultClass;
       }
 
       notify(
@@ -531,7 +544,7 @@ class UIWrapper implements IUIWrapper {
   //---------------------------------
 
   UIWrapper({String elementId: null}) {
-    _later = new UpdateManager();
+    _later = new UpdateManager(this);
     _eventDispatcher = new FrameworkEventDispatcher(dispatcher: this);
 
     _elementId = elementId;
@@ -610,6 +623,14 @@ class UIWrapper implements IUIWrapper {
 
       elementCast._reflowManager = _reflowManager;
       elementCast._owner = this;
+      
+      if (
+          (_stylePrefix != null) &&
+          (elementCast._stylePrefix == null)
+      ) {
+        elementCast._stylePrefix = _stylePrefix;
+      }
+      
       elementCast._initialize();
       
       if (_elementId != null) {
@@ -626,13 +647,9 @@ class UIWrapper implements IUIWrapper {
         }
       } else {
         if (prepend) {
-          _reflowManager.postRendering.whenComplete(
-              () => _control.children.insert(0, element.control)
-          );
+          _reflowManager.scheduleMethod(this, _prependControl, [element.control]);
         } else {
-          _reflowManager.postRendering.whenComplete(
-              () => _control.append(element.control)
-          );
+          _reflowManager.scheduleMethod(this, _appendControl, [element.control]);
         }
       }
 
@@ -640,6 +657,14 @@ class UIWrapper implements IUIWrapper {
       
       _children.add(element);
     }
+  }
+  
+  void _prependControl(Element controlToPrepend) {
+    _control.children.insert(0, controlToPrepend);
+  }
+  
+  void _appendControl(Element controlToAppend) {
+    _control.append(controlToAppend);
   }
 
   void remove(IUIWrapper element) {
@@ -678,17 +703,11 @@ class UIWrapper implements IUIWrapper {
     _control = element;
     
     if (_inheritsDefaultCSS) {
-      _reflowManager.postRendering.then(
-          (_) {
-            _control.classes.add('_' + _className);
-          }
-      );
+      _reflowManager.scheduleMethod(this, _addDefaultClass, [], forceSingleExecution: true);
     }
     
     if (_classes != null) {
-      _reflowManager.postRendering.then(
-          (_) => _control.classes.addAll(_classes)
-      );
+      _reflowManager.scheduleMethod(this, _addAllPendingClasses, [], forceSingleExecution: true);
     }
 
     _updateVisibility();
@@ -704,6 +723,22 @@ class UIWrapper implements IUIWrapper {
     invalidateProperties();
     
     _addAllPendingElements();
+  }
+  
+  void _updateDefaultClass() {
+    if (_inheritsDefaultCSS) {
+      _control.classes.add('_' + _className);
+    } else {
+      _control.classes.remove('_' + _className);
+    }
+  }
+  
+  void _addDefaultClass() {
+    _control.classes.add('_' + _className);
+  }
+  
+  void _addAllPendingClasses() {
+    _control.classes.addAll(_classes);
   }
 
   void _updateControl(int type) {

@@ -332,10 +332,13 @@ class DataGrid extends ListWrapper {
     
     _dataProvider.sort(
         (Map itemA, Map itemB) {
+          dynamic valA = (itemA[property] is bool) ? itemA[property] ? 1 : 0 : itemA[property];
+          dynamic valB = (itemA[property] is bool) ? itemB[property] ? 1 : 0 : itemB[property];
+          
           if (isAscSort) {
-            return itemA[property].compareTo(itemB[property]);
+            return valA.compareTo(valB);
           } else {
-            return itemB[property].compareTo(itemA[property]);
+            return valB.compareTo(valA);
           }
         }
     );

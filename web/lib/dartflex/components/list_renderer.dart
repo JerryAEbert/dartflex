@@ -308,7 +308,6 @@ class ListRenderer extends ListWrapper {
   void _createChildren() {
     final DivElement container = new DivElement()
     ..onScroll.listen(_container_scrollHandler)
-    ..onTouchMove.listen(_container_scrollHandler)
     ..onTouchCancel.listen(_container_scrollHandler)
     ..onTouchEnd.listen(_container_scrollHandler)
     ..onTouchLeave.listen(_container_scrollHandler)
@@ -613,13 +612,15 @@ class ListRenderer extends ListWrapper {
     selectedItem = newSelectedItem;
   }
 
-  void _container_scrollHandler(Event event) => _reflowManager.scheduleMethod(this, _updateScrollPosition, [(_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft]);
+  void _container_scrollHandler(Event event) => _updateScrollPosition();
   
-  void _updateScrollPosition(int position) {
+  void _updateScrollPosition() {
+    final int pos = (_layout is VerticalLayout) ? _control.scrollTop : _control.scrollLeft;
+    
     _hasScrolled = true;
     
-    if (position != _scrollPosition) {
-      scrollPosition = position;
+    if (pos != _scrollPosition) {
+      scrollPosition = pos;
       
       notify(
           new FrameworkEvent(

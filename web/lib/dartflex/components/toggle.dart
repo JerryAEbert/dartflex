@@ -8,7 +8,7 @@ class Toggle extends UIWrapper {
   //
   //---------------------------------
   
-  Button _handle;
+  RangeInputElement _handle;
 
   //---------------------------------
   //
@@ -32,6 +32,8 @@ class Toggle extends UIWrapper {
           'isToggledChanged'
         )
       );
+      
+      _commitIsToggled();
     }
   }
 
@@ -59,16 +61,15 @@ class Toggle extends UIWrapper {
 
   void _createChildren() {
     if (_control == null) {
-      _handle = new Button()
-      ..inheritsDefaultCSS = false
-      ..width = 30
-      ..height = 30;
+      _handle = new RangeInputElement()
+      ..value = _isToggled ? '1' : '0'
+      ..min = '0'
+      ..max = '1'
+      ..step = '1';
       
-      _handle.classes = ['_ToggleHandle'];
+      _handle.onChange.listen(_handle_changeHandler);
       
-      add(_handle);
-
-      _setControl(new DivElement());
+      _setControl(_handle);
     }
 
     super._createChildren();
@@ -76,6 +77,20 @@ class Toggle extends UIWrapper {
   
   void _updateLayout() {
     //super._updateLayout();
+  }
+  
+  void _commitIsToggled() {
+    if (_control != null) {
+      _reflowManager.scheduleMethod(this, _commitIsToggledOnReflow, []);
+    }
+  }
+  
+  void _commitIsToggledOnReflow() {
+    _handle.value = _isToggled ? '1' : '0';
+  }
+  
+  void _handle_changeHandler(Event event) {
+    isToggled = (_handle.value == '1');
   }
 }
 

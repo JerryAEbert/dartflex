@@ -27,15 +27,15 @@ class MainApplication {
     ..percentWidth = 100.0
     ..percentHeight = 100.0;
     
+    HomeView homeView = new HomeView()
+    ..listName = 'home';
     IndividualList individualList = new IndividualList()
-    ..listName = 'screen 1';
-    IndividualList individualList2 = new IndividualList()
-    ..listName = 'screen 2';
+    ..listName = 'list';
     
-    _viewStack.addView('shoppingList1', individualList);
-    _viewStack.addView('shoppingList2', individualList2);
+    _viewStack.addView('home', homeView);
+    _viewStack.addView('shoppingList', individualList);
     
-    _viewStack.show('shoppingList1');
+    _viewStack.show('home');
   }
   
 }

@@ -37,7 +37,7 @@ class IndividualList extends BaseView {
 
                  new DataGridColumn()
                  ..width = 120
-                 ..headerData = { 'label' : 'have it', 'property' : 'rating' }
+                 ..headerData = { 'label' : 'have it', 'property' : 'toggled' }
                  ..headerItemRendererFactory = new ClassFactory(constructorMethod: HeaderItemRenderer.construct)
                  ..columnItemRendererFactory = new ClassFactory(constructorMethod: ToggleItemRenderer.construct)
                  ]
@@ -94,6 +94,7 @@ class IndividualList extends BaseView {
     item['product'] = getRandomProduct();
     item['tag'] = getRandomTag();
     item['phone'] = getRandomPhone();
+    item['toggled'] = false;
 
     return item;
   }

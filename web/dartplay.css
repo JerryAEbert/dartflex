@@ -38,24 +38,41 @@ html,body {
 }
 
 ._Toggle {
+  -webkit-appearance: none;  
+  width: 100%;  
+  background: #ddd;  
+  padding: 3px;  
   -moz-border-radius: 15px;
   border-radius: 15px;
-  border: 1px solid #cccccc;
-  background: -webkit-linear-gradient(top, #95ba76, #7ca55d);
-  background: -moz-linear-gradient(top, #ffffff, #dddddd);
-  background: -ms-linear-gradient(top, #ffffff, #dddddd);
-  background: -o-linear-gradient(top, #ffffff, #dddddd);
+  border: 1px solid #808080; 
+  -webkit-border-radius: 15px;
+  background-image: -webkit-gradient(  
+    linear,  
+    left top,  
+    left bottombottom,  
+    color-stop(0, #000000),  
+    color-stop(1, #222222)
+  );
 }
 
-._ToggleHandle {
-  -moz-border-radius: 15px;
-  border-radius: 15px;
-  border: 1px solid #808080;
-  background: -webkit-linear-gradient(top, #ffffff, #dddddd);
-  background: -moz-linear-gradient(top, #ffffff, #dddddd);
-  background: -ms-linear-gradient(top, #ffffff, #dddddd);
-  background: -o-linear-gradient(top, #ffffff, #dddddd);
-}
+._Toggle::-webkit-slider-thumb { 
+  -webkit-appearance: none;  
+  width: 50%;
+  height: 30px; 
+  background: #888;  
+  padding: 3px;  
+  -moz-border-radius: 13px;
+  border-radius: 13px;
+  border: 1px solid #808080; 
+  -webkit-border-radius: 13px;
+  background-image: -webkit-gradient(  
+    linear,  
+    left top,  
+    left bottombottom,  
+    color-stop(0, #000000),  
+    color-stop(1, #222222)
+  );
+}  
  
 ._ListRenderer {
   -webkit-overflow-scrolling: touch;
@@ -143,10 +160,7 @@ html,body {
 }
 
 ._DataGridItemRenderer {
-  background: -webkit-gradient(linear, 0 2, 0% 0%, from(#ffffff), to(#dddddd));
-  background: -moz-gradient(linear, 0 2, 0% 0%, from(#ffffff), to(#dddddd));
-  background: -ms-gradient(linear, 0 2, 0% 0%, from(#ffffff), to(#dddddd));
-  background: -o-gradient(linear, 0 2, 0% 0%, from(#ffffff), to(#dddddd));
+  border-bottom: 1px solid #cccccc;
 }
 
 /*@media handheld {
