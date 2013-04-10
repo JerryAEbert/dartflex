@@ -98,20 +98,21 @@ class ReflowManager {
     if (!hasOccurance) {
       invokation = new MethodInvokationMap()
       ..owner = owner
-      ..method = method;
+      ..method = method
+      ..arguments = arguments;
 
       _scheduledHandlers.add(invokation);
+      
+      animationFrame.then(
+          (num highResTimer) {
+            _scheduledHandlers.remove(invokation);
+            
+            Function.apply(invokation.method, invokation.arguments);
+          }
+      );
     }
     
     invokation.arguments = arguments;
-    
-    animationFrame.then(
-        (_) {
-          Function.apply(invokation.method, invokation.arguments);
-          
-          _scheduledHandlers.remove(invokation);
-        }
-    );
   }
 
   void invalidateCSS(Element element, String property, String value) {
@@ -139,27 +140,27 @@ class ReflowManager {
       ..cssDecl = new Map();
 
       _elements.add(elementCSSMap);
+      
+      animationFrame.whenComplete(
+          () {
+            final String cssCache = elementCSSMap.element.style.cssText;
+            
+            _elements.remove(elementCSSMap);
+            
+            _detachedElement.style.cssText = cssCache;
+
+            elementCSSMap.cssDecl.forEach(
+                (String propertyName, String value) => _detachedElement.style.setProperty(propertyName, value, '')
+            );
+            
+            if (cssCache != _detachedElement.style.cssText) {
+              elementCSSMap.element.style.cssText = _detachedElement.style.cssText;
+            }
+          }    
+      );
     }
 
     elementCSSMap.cssDecl[property] = value;
-    
-    animationFrame.whenComplete(
-      () {
-        final String cssCache = elementCSSMap.element.style.cssText;
-        
-        _detachedElement.style.cssText = cssCache;
-
-        elementCSSMap.cssDecl.forEach(
-            (String propertyName, String value) => _detachedElement.style.setProperty(propertyName, value, '')
-        );
-        
-        if (cssCache != _detachedElement.style.cssText) {
-          elementCSSMap.element.style.cssText = _detachedElement.style.cssText;
-        }
-        
-        _elements.remove(elementCSSMap);
-      }    
-    );
   }
 }
 
