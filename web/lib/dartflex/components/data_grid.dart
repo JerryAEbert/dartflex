@@ -24,6 +24,9 @@ class DataGrid extends ListWrapper {
   // columns
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onColumnsChangedEvent = const EventHook<FrameworkEvent>('columnsChanged');
+  Stream<FrameworkEvent> get onColumnsChanged => DataGrid.onColumnsChangedEvent.forTarget(this);
+  
   ListCollection _columns;
   bool _isColumnsChanged = false;
 
@@ -41,10 +44,7 @@ class DataGrid extends ListWrapper {
       _isColumnsChanged = true;
 
       if (value != null) {
-        value.observe(
-            CollectionEvent.COLLECTION_CHANGED,
-            _columns_collectionChangedHandler
-        );
+        value.onCollectionChanged.listen(_columns_collectionChangedHandler);
       }
 
       notify(
@@ -61,6 +61,8 @@ class DataGrid extends ListWrapper {
   // headerHeight
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onHeaderHeightChangedEvent = const EventHook<FrameworkEvent>('headerHeightChanged');
+  Stream<FrameworkEvent> get onHeaderHeightChanged => DataGrid.onHeaderHeightChangedEvent.forTarget(this);
   int _headerHeight = 24;
 
   int get headerHeight => _headerHeight;
@@ -82,6 +84,8 @@ class DataGrid extends ListWrapper {
   // rowHeight
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onRowHeightChangedEvent = const EventHook<FrameworkEvent>('rowHeightChanged');
+  Stream<FrameworkEvent> get onRowHeightChanged => DataGrid.onRowHeightChangedEvent.forTarget(this);
   int _rowHeight = 30;
 
   int get rowHeight => _rowHeight;
@@ -103,6 +107,8 @@ class DataGrid extends ListWrapper {
   // columnSpacing
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onColumnSpacingChangedEvent = const EventHook<FrameworkEvent>('columnSpacingChanged');
+  Stream<FrameworkEvent> get onColumnSpacingChanged => DataGrid.onColumnSpacingChangedEvent.forTarget(this);
   int _columnSpacing = 1;
 
   int get columnSpacing => _columnSpacing;
@@ -124,6 +130,8 @@ class DataGrid extends ListWrapper {
   // rowSpacing
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onRowSpacingChangedEvent = const EventHook<FrameworkEvent>('rowSpacingChanged');
+  Stream<FrameworkEvent> get onRowSpacingChanged => DataGrid.onRowSpacingChangedEvent.forTarget(this);
   int _rowSpacing = 1;
 
   int get rowSpacing => _rowSpacing;
@@ -145,6 +153,9 @@ class DataGrid extends ListWrapper {
   // useSelectionEffects
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onUseSelectionEffectsChangedEvent = const EventHook<FrameworkEvent>('useSelectionEffectsChanged');
+  Stream<FrameworkEvent> get onUseSelectionEffectsChanged => DataGrid.onUseSelectionEffectsChangedEvent.forTarget(this);
+  
   bool _useSelectionEffects = true;
   bool _isUseSelectionEffectsChanged = false;
 
@@ -215,10 +226,7 @@ class DataGrid extends ListWrapper {
 
     _setControl(container);
 
-    _list.observe(
-      'rendererAdded',
-      _list_rendererAddedHandler
-    );
+    _list.onRendererAdded.listen(_list_rendererAddedHandler);
 
     super._createChildren();
   }
@@ -245,21 +253,19 @@ class DataGrid extends ListWrapper {
     super._updateScrollPolicy();
     
     if (_horizontalScrollPolicy == ScrollPolicy.NONE) {
-      _list.ignore(
+      //_list.onScrollPositionChanged.close();
+      /*_list.ignore(
           'scrollChanged',
           _list_scrollChangedHandler
-      );
+      );*/
     } else {
-      _list.observe(
-          'scrollChanged',
-          _list_scrollChangedHandler
-      );
+      _list.onScrollPositionChanged.listen(_list_scrollChangedHandler);
     }
   }
 
   void _removeAllElements() {
     if (_headerItemRenderers != null) {
-      _headerItemRenderers.removeAll(_headerItemRenderers);
+      _headerItemRenderers.removeRange(0, _headerItemRenderers.length);
     }
     
     if (_headerContainer != null) {
@@ -402,7 +408,7 @@ class DataGrid extends ListWrapper {
     final DataGridItemRenderer renderer = event.relatedObject as DataGridItemRenderer
       ..gap = _columnSpacing
       ..columns = _columns;
-
+    
     invalidateProperties();
   }
 

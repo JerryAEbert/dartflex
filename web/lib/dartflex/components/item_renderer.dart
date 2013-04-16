@@ -116,15 +116,11 @@ class ItemRenderer extends UIWrapper implements IItemRenderer {
   //---------------------------------
 
   String get interactionStyle {
-    List<String> enum = new List<String>();
-
     if (_selected) {
-      enum.add('selected');
+      return 'selected_$_state';
     }
 
-    enum.add(_state);
-
-    return enum.join('_');
+    return _state;
   }
 
   //---------------------------------

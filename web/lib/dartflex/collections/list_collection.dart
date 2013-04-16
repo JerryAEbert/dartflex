@@ -1,6 +1,9 @@
 part of dartflex;
 
 class ListCollection extends FrameworkEventDispatcher implements IFrameworkEventDispatcher {
+  
+  static const EventHook<CollectionEvent> onCollectionChangedEvent = const EventHook<CollectionEvent>(CollectionEvent.COLLECTION_CHANGED);
+  Stream<CollectionEvent> get onCollectionChanged => ListCollection.onCollectionChangedEvent.forTarget(this);
 
   Map _collapseMap = new Map();
   List<Map> _unrolledHierarchy;

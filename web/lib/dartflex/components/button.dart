@@ -12,6 +12,8 @@ class Button extends UIWrapper {
   // label
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onLabelChangedEvent = const EventHook<FrameworkEvent>('labelChanged');
+  Stream<FrameworkEvent> get onLabelChanged => Button.onLabelChangedEvent.forTarget(this);
   String _label;
 
   String get label => _label;
@@ -50,6 +52,9 @@ class Button extends UIWrapper {
   // Protected methods
   //
   //---------------------------------
+  
+  static const EventHook<FrameworkEvent> onClickEvent = const EventHook<FrameworkEvent>('click');
+  Stream<FrameworkEvent> get onClick => Button.onClickEvent.forTarget(this);
 
   void _createChildren() {
     if (_control == null) {

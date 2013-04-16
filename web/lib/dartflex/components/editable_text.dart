@@ -18,6 +18,8 @@ class EditableText extends UIWrapper {
   // text
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onTextChangedEvent = const EventHook<FrameworkEvent>('textChanged');
+  Stream<FrameworkEvent> get onTextChanged => EditableText.onTextChangedEvent.forTarget(this);
   String _text;
 
   String get text => _text;
@@ -39,6 +41,8 @@ class EditableText extends UIWrapper {
   // align
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onAlignChangedEvent = const EventHook<FrameworkEvent>('alignChanged');
+  Stream<FrameworkEvent> get onAlignChanged => EditableText.onAlignChangedEvent.forTarget(this);
   String _align = 'left';
 
   String get align => _align;
@@ -60,6 +64,8 @@ class EditableText extends UIWrapper {
   // verticalAlign
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onVerticalAlignChangedEvent = const EventHook<FrameworkEvent>('verticalAlignChanged');
+  Stream<FrameworkEvent> get onVerticalAlignChanged => EditableText.onVerticalAlignChangedEvent.forTarget(this);
   String _verticalAlign = 'text-top';
 
   String get verticalAlign => _verticalAlign;

@@ -91,6 +91,8 @@ class FrameworkEventDispatcher implements IFrameworkEventDispatcher {
 
   void notify(FrameworkEvent event) {
     if (_observers.containsKey(event.type)) {
+      event.currentTarget = _dispatcher;
+      
       _observers[event.type].forEach(
           (Function handler) => handler(event)
       );

@@ -1,6 +1,39 @@
 part of dartflex;
 
 abstract class IUIWrapper implements IFrameworkEventDispatcher {
+  
+  //---------------------------------
+  //
+  // Events
+  //
+  //---------------------------------
+  
+  Stream<FrameworkEvent> get onStylePrefixChanged;
+  Stream<FrameworkEvent> get onClassesChanged;
+  Stream<FrameworkEvent> get onIncludeInLayoutChanged;
+  Stream<FrameworkEvent> get onAutoSizeChanged;
+  Stream<FrameworkEvent> get onVisibleChanged;
+  Stream<FrameworkEvent> get onXChanged;
+  Stream<FrameworkEvent> get onYChanged;
+  Stream<FrameworkEvent> get onWidthChanged;
+  Stream<FrameworkEvent> get onPercentWidthChanged;
+  Stream<FrameworkEvent> get onHeightChanged;
+  Stream<FrameworkEvent> get onPercentHeightChanged;
+  Stream<FrameworkEvent> get onPaddingLeftChanged;
+  Stream<FrameworkEvent> get onPaddingRightChanged;
+  Stream<FrameworkEvent> get onPaddingTopChanged;
+  Stream<FrameworkEvent> get onPaddingBottomChanged;
+  Stream<FrameworkEvent> get onLayoutChanged;
+  Stream<FrameworkEvent> get onInheritsDefaultCSSChanged;
+  Stream<FrameworkEvent> get onControlChanged;
+  Stream<FrameworkEvent> get onInitializationComplete;
+  Stream<FrameworkEvent> get onOwnerChanged;
+  
+  //---------------------------------
+  //
+  // Public properties
+  //
+  //---------------------------------
 
   Graphics _graphics;
   Graphics get graphics;
@@ -64,6 +97,12 @@ abstract class IUIWrapper implements IFrameworkEventDispatcher {
 
   Element get control;
   
+  //---------------------------------
+  //
+  // Public methods
+  //
+  //---------------------------------
+  
   void preInitialize(IUIWrapper forOwner);
   void invalidateProperties();
   void add(IUIWrapper element, {bool prepend: false});
@@ -125,6 +164,8 @@ class UIWrapper implements IUIWrapper {
   // stylePrefix
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onStylePrefixChangedEvent = const EventHook<FrameworkEvent>('stylePrefixChanged');
+  Stream<FrameworkEvent> get onStylePrefixChanged => UIWrapper.onStylePrefixChangedEvent.forTarget(this);
   String _stylePrefix;
   bool _isStylePrefixChanged = false;
 
@@ -146,12 +187,14 @@ class UIWrapper implements IUIWrapper {
   // classes
   //---------------------------------
 
-  Collection<String> _classes;
+  static const EventHook<FrameworkEvent> onClassesChangedEvent = const EventHook<FrameworkEvent>('classesChanged');
+  Stream<FrameworkEvent> get onClassesChanged => UIWrapper.onClassesChangedEvent.forTarget(this);
+  List<String> _classes;
   bool _isClassesChanged = false;
 
-  Collection<String> get classes => _classes;
+  List<String> get classes => _classes;
 
-  set classes(Collection<String> value) {
+  set classes(List<String> value) {
     if (value != _classes) {
       _classes = value;
 
@@ -167,6 +210,8 @@ class UIWrapper implements IUIWrapper {
   // includeInLayout
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onIncludeInLayoutChangedEvent = const EventHook<FrameworkEvent>('includeInLayoutChanged');
+  Stream<FrameworkEvent> get onIncludeInLayoutChanged => UIWrapper.onIncludeInLayoutChangedEvent.forTarget(this);
   bool _includeInLayout = true;
 
   bool get includeInLayout => _includeInLayout;
@@ -191,6 +236,8 @@ class UIWrapper implements IUIWrapper {
   // autoSize
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onAutoSizeChangedEvent = const EventHook<FrameworkEvent>('autoSizeChanged');
+  Stream<FrameworkEvent> get onAutoSizeChanged => UIWrapper.onAutoSizeChangedEvent.forTarget(this);
   bool _autoSize = true;
 
   bool get autoSize => _autoSize;
@@ -214,7 +261,9 @@ class UIWrapper implements IUIWrapper {
   //---------------------------------
   // visible
   //---------------------------------
-
+  
+  static const EventHook<FrameworkEvent> onVisibleChangedEvent = const EventHook<FrameworkEvent>('visibleChanged');
+  Stream<FrameworkEvent> get onVisibleChanged => UIWrapper.onVisibleChangedEvent.forTarget(this);
   bool _visible = true;
 
   bool get visible => _visible;
@@ -234,7 +283,9 @@ class UIWrapper implements IUIWrapper {
   //---------------------------------
   // x
   //---------------------------------
-
+  
+  static const EventHook<FrameworkEvent> onXChangedEvent = const EventHook<FrameworkEvent>('xChanged');
+  Stream<FrameworkEvent> get onXChanged => UIWrapper.onXChangedEvent.forTarget(this);
   int _x = 0;
 
   int get x => _x;
@@ -255,6 +306,8 @@ class UIWrapper implements IUIWrapper {
   // y
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onYChangedEvent = const EventHook<FrameworkEvent>('yChanged');
+  Stream<FrameworkEvent> get onYChanged => UIWrapper.onYChangedEvent.forTarget(this);
   int _y = 0;
 
   int get y => _y;
@@ -275,6 +328,8 @@ class UIWrapper implements IUIWrapper {
   // width
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onWidthChangedEvent = const EventHook<FrameworkEvent>('widthChanged');
+  Stream<FrameworkEvent> get onWidthChanged => UIWrapper.onWidthChangedEvent.forTarget(this);
   int _width = 0;
 
   int get width => _width;
@@ -297,6 +352,8 @@ class UIWrapper implements IUIWrapper {
   // percentWidth
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onPercentWidthChangedEvent = const EventHook<FrameworkEvent>('percentWidthChanged');
+  Stream<FrameworkEvent> get onPercentWidthChanged => UIWrapper.onPercentWidthChangedEvent.forTarget(this);
   double _percentWidth = 0.0;
 
   double get percentWidth => _percentWidth;
@@ -317,6 +374,8 @@ class UIWrapper implements IUIWrapper {
   // height
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onHeightChangedEvent = const EventHook<FrameworkEvent>('heightChanged');
+  Stream<FrameworkEvent> get onHeightChanged => UIWrapper.onHeightChangedEvent.forTarget(this);
   int _height = 0;
 
   int get height => _height;
@@ -339,6 +398,8 @@ class UIWrapper implements IUIWrapper {
   // percentHeight
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onPercentHeightChangedEvent = const EventHook<FrameworkEvent>('percentHeightChanged');
+  Stream<FrameworkEvent> get onPercentHeightChanged => UIWrapper.onPercentHeightChangedEvent.forTarget(this);
   double _percentHeight = 0.0;
 
   double get percentHeight => _percentHeight;
@@ -359,6 +420,8 @@ class UIWrapper implements IUIWrapper {
   // paddingLeft
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onPaddingLeftChangedEvent = const EventHook<FrameworkEvent>('paddingLeftChanged');
+  Stream<FrameworkEvent> get onPaddingLeftChanged => UIWrapper.onPaddingLeftChangedEvent.forTarget(this);
   int _paddingLeft = 0;
 
   int get paddingLeft => _paddingLeft;
@@ -379,6 +442,8 @@ class UIWrapper implements IUIWrapper {
   // paddingRight
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onPaddingRightChangedEvent = const EventHook<FrameworkEvent>('paddingRightChanged');
+  Stream<FrameworkEvent> get onPaddingRightChanged => UIWrapper.onPaddingRightChangedEvent.forTarget(this);
   int _paddingRight = 0;
 
   int get paddingRight => _paddingRight;
@@ -399,6 +464,8 @@ class UIWrapper implements IUIWrapper {
   // paddingTop
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onPaddingTopChangedEvent = const EventHook<FrameworkEvent>('paddingTopChanged');
+  Stream<FrameworkEvent> get onPaddingTopChanged => UIWrapper.onPaddingTopChangedEvent.forTarget(this);
   int _paddingTop = 0;
 
   int get paddingTop => _paddingTop;
@@ -419,6 +486,8 @@ class UIWrapper implements IUIWrapper {
   // paddingBottom
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onPaddingBottomChangedEvent = const EventHook<FrameworkEvent>('paddingBottomChanged');
+  Stream<FrameworkEvent> get onPaddingBottomChanged => UIWrapper.onPaddingBottomChangedEvent.forTarget(this);
   int _paddingBottom = 0;
 
   int get paddingBottom => _paddingBottom;
@@ -439,6 +508,8 @@ class UIWrapper implements IUIWrapper {
   // layout
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onLayoutChangedEvent = const EventHook<FrameworkEvent>('layoutChanged');
+  Stream<FrameworkEvent> get onLayoutChanged => UIWrapper.onLayoutChangedEvent.forTarget(this);
   ILayout _layout;
 
   ILayout get layout => _layout;
@@ -458,6 +529,8 @@ class UIWrapper implements IUIWrapper {
   // inheritsDefaultCSS
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onInheritsDefaultCSSChangedEvent = const EventHook<FrameworkEvent>('inheritsDefaultCSSChanged');
+  Stream<FrameworkEvent> get onInheritsDefaultCSSChanged => UIWrapper.onInheritsDefaultCSSChangedEvent.forTarget(this);
   bool _inheritsDefaultCSS = true;
 
   bool get inheritsDefaultCSS => _inheritsDefaultCSS;
@@ -501,6 +574,8 @@ class UIWrapper implements IUIWrapper {
   // owner
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onOwnerChangedEvent = const EventHook<FrameworkEvent>('ownerChanged');
+  Stream<FrameworkEvent> get onOwnerChanged => UIWrapper.onOwnerChangedEvent.forTarget(this);
   IUIWrapper _owner;
 
   IUIWrapper get owner => _owner;
@@ -533,6 +608,8 @@ class UIWrapper implements IUIWrapper {
   // control
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onControlChangedEvent = const EventHook<FrameworkEvent>('controlChanged');
+  Stream<FrameworkEvent> get onControlChanged => UIWrapper.onControlChangedEvent.forTarget(this);
   Element _control;
 
   Element get control => _control;
@@ -591,6 +668,14 @@ class UIWrapper implements IUIWrapper {
   void preInitialize(IUIWrapper forOwner) {
     _reflowManager = new ReflowManager();
     _owner = forOwner;
+    
+    notify(
+        new FrameworkEvent(
+            'ownerChanged',
+            relatedObject: forOwner
+        )
+    );
+    
     _initialize();
   }
 
@@ -623,6 +708,13 @@ class UIWrapper implements IUIWrapper {
 
       elementCast._reflowManager = _reflowManager;
       elementCast._owner = this;
+      
+      elementCast.notify(
+          new FrameworkEvent(
+              'ownerChanged',
+              relatedObject: this
+          )
+      );
       
       if (
           (_stylePrefix != null) &&
@@ -779,6 +871,9 @@ class UIWrapper implements IUIWrapper {
       later > _updateSize;
     }
   }
+  
+  static const EventHook<FrameworkEvent> onInitializationCompleteEvent = const EventHook<FrameworkEvent>('initializationComplete');
+  Stream<FrameworkEvent> get onInitializationComplete => UIWrapper.onInitializationCompleteEvent.forTarget(this);
 
   void _initialize() {
     if (!_isInitialized) {
@@ -866,20 +961,15 @@ class UIWrapper implements IUIWrapper {
     if (_control != null) {
       _control.hidden = !_visible;
     } else {
-      this['controlChanged'] = (
-        (FrameworkEvent event) {
-          _control.hidden = !_visible;
-        }
+      onControlChanged.listen(
+          (FrameworkEvent event) {
+            _control.hidden = !_visible;
+          }
       );
     }
   }
 
   void _addAllPendingElements() {
-    _eventDispatcher.ignore(
-        'controlChanged',
-        _addAllPendingElements
-    );
-    
     _addLaterElements.forEach(
         (element) => add(element)
     );

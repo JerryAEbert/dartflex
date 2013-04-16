@@ -33,7 +33,7 @@ class ClassFactory {
       LibraryMirror libraryMirror = mirrorSystem.libraries[_library];
       ClassMirror classMirror = libraryMirror.classes[_className];
 
-      return classMirror.newInstance('', []);
+      return classMirror.newInstanceAsync('', []);
     }
   }
 

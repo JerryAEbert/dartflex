@@ -96,8 +96,7 @@ class ViewStack extends UIWrapper {
   
   bool show(String uniqueId) {
     if (_container == null) {
-      observe(
-          'controlChanged', 
+      onControlChanged.listen(
           (FrameworkEvent event) => show(uniqueId)
       );
     } else {

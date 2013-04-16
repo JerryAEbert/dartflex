@@ -7,6 +7,6 @@ class CollectionEvent extends FrameworkEvent {
     return new CollectionEvent.construct('CollectionEvent', type, relatedObject: relatedObject);
   }
 
-  static String COLLECTION_CHANGED = 'collectionChanged';
+  static const String COLLECTION_CHANGED = 'collectionChanged';
 }
 

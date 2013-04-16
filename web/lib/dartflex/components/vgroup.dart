@@ -12,7 +12,10 @@ class VGroup extends Group {
   // gap
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onGapChangedEvent = const EventHook<FrameworkEvent>('gapChanged');
+  Stream<FrameworkEvent> get onGapChanged => VGroup.onGapChangedEvent.forTarget(this);
   int get gap => _layout.gap;
+  
   set gap(int value) {
     if (value != _layout.gap) {
       _layout.gap = value;

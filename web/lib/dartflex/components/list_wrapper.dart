@@ -30,10 +30,7 @@ class ListWrapper extends Group {
       _isElementUpdateRequired = true;
 
       if (value != null) {
-        value.observe(
-            CollectionEvent.COLLECTION_CHANGED,
-            _dataProvider_collectionChangedHandler
-        );
+        value.onCollectionChanged.listen(_dataProvider_collectionChangedHandler);
       }
 
       invalidateProperties();
@@ -55,6 +52,8 @@ class ListWrapper extends Group {
   // selectedIndex
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onSelectedIndexChangedEvent = const EventHook<FrameworkEvent>('selectedIndexChanged');
+  Stream<FrameworkEvent> get onSelectedIndexChanged => ListWrapper.onSelectedIndexChangedEvent.forTarget(this);
   int _selectedIndex = -1;
 
   int get selectedIndex => _selectedIndex;
@@ -77,6 +76,8 @@ class ListWrapper extends Group {
   // selectedItem
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onSelectedItemChangedEvent = const EventHook<FrameworkEvent>('selectedItemChanged');
+  Stream<FrameworkEvent> get onSelectedItemChanged => ListWrapper.onSelectedItemChangedEvent.forTarget(this);
   Object _selectedItem;
 
   Object get selectedItem => _selectedItem;

@@ -2,9 +2,9 @@ part of dartflex;
 
 class ScrollPolicy {
 
-  static String get NONE => 'none';
-  static String get AUTO => 'auto';
-  static String get ON => 'on';
+  static const String NONE = 'none';
+  static const String AUTO = 'auto';
+  static const String ON = 'on';
 
   ScrollPolicy() {}
 

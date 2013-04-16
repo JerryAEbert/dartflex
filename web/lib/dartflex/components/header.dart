@@ -19,6 +19,9 @@ class Header extends Group {
   //---------------------------------
   // label
   //---------------------------------
+  
+  static const EventHook<FrameworkEvent> onLabelChangedEvent = const EventHook<FrameworkEvent>('labelChanged');
+  Stream<FrameworkEvent> get onLabelChanged => Header.onLabelChangedEvent.forTarget(this);
 
   String _label;
   bool _isLabelChanged = false;
@@ -58,6 +61,9 @@ class Header extends Group {
   //---------------------------------
   // leftSideItems
   //---------------------------------
+  
+  static const EventHook<FrameworkEvent> onLeftSideItemsChangedEvent = const EventHook<FrameworkEvent>('leftSideItemsChanged');
+  Stream<FrameworkEvent> get onLeftSideItemsChanged => Header.onLeftSideItemsChangedEvent.forTarget(this);
 
   ListCollection _leftSideItems;
   bool _isLeftSideItemsChanged = false;
@@ -76,10 +82,7 @@ class Header extends Group {
       _isLeftSideItemsChanged = true;
       
       if (value != null) {
-        value.observe(
-            CollectionEvent.COLLECTION_CHANGED, 
-            _leftSideItems_collectionChangedHandler
-        );
+        value.onCollectionChanged.listen(_leftSideItems_collectionChangedHandler);
       }
 
       notify(
@@ -95,6 +98,9 @@ class Header extends Group {
   //---------------------------------
   // rightSideItems
   //---------------------------------
+  
+  static const EventHook<FrameworkEvent> onRightSideItemsChangedEvent = const EventHook<FrameworkEvent>('rightSideItemsChanged');
+  Stream<FrameworkEvent> get onRightSideItemsChanged => Header.onRightSideItemsChangedEvent.forTarget(this);
 
   ListCollection _rightSideItems;
   bool _isRightSideItemsChanged = false;
@@ -113,10 +119,7 @@ class Header extends Group {
       _isRightSideItemsChanged = true;
       
       if (value != null) {
-        value.observe(
-            CollectionEvent.COLLECTION_CHANGED, 
-            _rightSideItems_collectionChangedHandler
-        );
+        value.onCollectionChanged.listen(_rightSideItems_collectionChangedHandler);
       }
 
       notify(
@@ -160,8 +163,8 @@ class Header extends Group {
     
     _rightSideContainer.layout.align = 'right';
     
-    _headerLabel['widthChanged'] = _updateWidth;
-    _headerLabel['heightChanged'] = _updateHeight;
+    _headerLabel.onWidthChanged.listen(_updateWidth);
+    _headerLabel.onHeightChanged.listen(_updateHeight);
     
     add(_leftSideContainer);
     add(_rightSideContainer);
@@ -263,7 +266,9 @@ class Header extends Group {
       child = dataProvider[i];
       
       if (group.children.indexOf(child) == -1) {
-        child['heightChanged'] = invalidateProperties;
+        child.onHeightChanged.listen(
+            (FrameworkEvent event) => invalidateProperties()
+        );
         
         group.add(child);
       }

@@ -20,6 +20,8 @@ class Toggle extends UIWrapper {
   // label
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onIsToggledChangedEvent = const EventHook<FrameworkEvent>('isToggledChanged');
+  Stream<FrameworkEvent> get onIsToggledChanged => Toggle.onIsToggledChangedEvent.forTarget(this);
   bool _isToggled = false;
 
   bool get isToggled => _isToggled;

@@ -12,6 +12,8 @@ class Image extends UIWrapper {
   // source
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onSourceChangedEvent = const EventHook<FrameworkEvent>('sourceChanged');
+  Stream<FrameworkEvent> get onSourceChanged => Image.onSourceChangedEvent.forTarget(this);
   String _source;
 
   String get source => _source;

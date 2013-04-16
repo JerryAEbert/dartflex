@@ -44,11 +44,13 @@ class HeaderItemRenderer extends ItemRenderer {
       _button.label = data['label'];
     }
 
-    _button['click'] = (FrameworkEvent event) => notify(
-      new FrameworkEvent(
-        'click',
-        relatedObject: data
-      )
+    _button.onClick.listen(
+        (FrameworkEvent event) => notify(
+            new FrameworkEvent(
+                'click',
+                relatedObject: data
+            )
+        )
     );
 
     add(_button);
@@ -162,11 +164,13 @@ class ProductItemRenderer extends ItemRenderer {
     ..paddingRight = 1
     ..text = (data != null) ? data['product'] : '';
     
-    _label['textChanged'] = (FrameworkEvent event) {
-      if (data != null) {
-        data['product'] = _label.text;
-      }
-    };
+    _label.onTextChanged.listen(
+        (FrameworkEvent event) {
+          if (data != null) {
+            data['product'] = _label.text;
+          }
+        }
+    );
 
     add(_label);
   }
@@ -520,11 +524,13 @@ class ToggleItemRenderer extends ItemRenderer {
     ..width = 80
     ..height = 30;
     
-    _toggle['isToggledChanged'] = (FrameworkEvent event) {
-      if (data != null) {
-        data['toggled'] = _toggle.isToggled;
-      }
-    };
+    _toggle.onIsToggledChanged.listen(
+        (FrameworkEvent event) {
+          if (data != null) {
+            data['toggled'] = _toggle.isToggled;
+          }
+        }    
+    );
 
     add(_toggle);
   }

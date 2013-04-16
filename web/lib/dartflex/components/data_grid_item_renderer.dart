@@ -19,6 +19,9 @@ class DataGridItemRenderer extends ItemRenderer {
   //---------------------------------
   // itemRenderers
   //---------------------------------
+  
+  static const EventHook<FrameworkEvent> onColumnsChangedEvent = const EventHook<FrameworkEvent>('columnsChanged');
+  Stream<FrameworkEvent> get onColumnsChanged => DataGridItemRenderer.onColumnsChangedEvent.forTarget(this);
 
   ListCollection _columns;
   bool _isColumnsChanged = false;
@@ -37,10 +40,7 @@ class DataGridItemRenderer extends ItemRenderer {
       _isColumnsChanged = true;
 
       if (value != null) {
-        value.observe(
-            CollectionEvent.COLLECTION_CHANGED,
-            _itemRenderers_collectionChangedHandler
-        );
+        value.onCollectionChanged.listen(_itemRenderers_collectionChangedHandler);
       }
 
       notify(
@@ -150,7 +150,7 @@ class DataGridItemRenderer extends ItemRenderer {
     }
   }
 
-  void _itemRenderers_collectionChangedHandler() {
+  void _itemRenderers_collectionChangedHandler(CollectionEvent event) {
     _updateItemRenderers();
   }
 

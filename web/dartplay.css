@@ -75,7 +75,7 @@ html,body {
 }  
  
 ._ListRenderer {
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: scroll;
   border: 1px solid rgb(128, 128, 128);
   background-color: rgb(255, 255, 255);
 }

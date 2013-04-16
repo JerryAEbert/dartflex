@@ -21,6 +21,8 @@ class RichText extends UIWrapper {
   // text
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onTextChangedEvent = const EventHook<FrameworkEvent>('textChanged');
+  Stream<FrameworkEvent> get onTextChanged => RichText.onTextChangedEvent.forTarget(this);
   String _text;
 
   String get text => _text;
@@ -42,6 +44,8 @@ class RichText extends UIWrapper {
   // align
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onAlignChangedEvent = const EventHook<FrameworkEvent>('alignChanged');
+  Stream<FrameworkEvent> get onAlignChanged => RichText.onAlignChangedEvent.forTarget(this);
   String _align = 'left';
 
   String get align => _align;
@@ -63,6 +67,8 @@ class RichText extends UIWrapper {
   // verticalAlign
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onVerticalAlignChangedEvent = const EventHook<FrameworkEvent>('verticalAlignChanged');
+  Stream<FrameworkEvent> get onVerticalAlignChanged => RichText.onVerticalAlignChangedEvent.forTarget(this);
   String _verticalAlign = 'text-top';
 
   String get verticalAlign => _verticalAlign;

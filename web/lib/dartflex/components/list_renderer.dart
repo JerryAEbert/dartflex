@@ -45,6 +45,9 @@ class ListRenderer extends ListWrapper {
   //---------------------------------
   // orientation
   //---------------------------------
+  
+  static const EventHook<FrameworkEvent> onOrientationChangedEvent = const EventHook<FrameworkEvent>('orientationChanged');
+  Stream<FrameworkEvent> get onOrientationChanged => ListRenderer.onOrientationChangedEvent.forTarget(this);
 
   String _orientation;
   bool _isOrientationChanged = false;
@@ -68,6 +71,9 @@ class ListRenderer extends ListWrapper {
   //---------------------------------
   // useSelectionEffects
   //---------------------------------
+  
+  static const EventHook<FrameworkEvent> onUseSelectionEffectsChangedEvent = const EventHook<FrameworkEvent>('useSelectionEffectsChanged');
+  Stream<FrameworkEvent> get onUseSelectionEffectsChanged => ListRenderer.onUseSelectionEffectsChangedEvent.forTarget(this);
 
   bool _useSelectionEffects = true;
   bool _isUseSelectionEffectsChanged = false;
@@ -92,6 +98,8 @@ class ListRenderer extends ListWrapper {
   // itemRenderer
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onItemRendererFactoryChangedEvent = const EventHook<FrameworkEvent>('itemRendererFactoryChanged');
+  Stream<FrameworkEvent> get onItemRendererFactoryChanged => ListRenderer.onItemRendererFactoryChangedEvent.forTarget(this);
   ClassFactory _itemRendererFactory;
 
   ClassFactory get itemRendererFactory => _itemRendererFactory;
@@ -113,6 +121,8 @@ class ListRenderer extends ListWrapper {
   // colWidth
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onColWidthChangedEvent = const EventHook<FrameworkEvent>('colWidthChanged');
+  Stream<FrameworkEvent> get onColWidthChanged => ListRenderer.onColWidthChangedEvent.forTarget(this);
   int _colWidth = 0;
 
   int get colWidth => _colWidth;
@@ -134,6 +144,8 @@ class ListRenderer extends ListWrapper {
   // colPercentWidth
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onColPercentWidthChangedEvent = const EventHook<FrameworkEvent>('colPercentWidthChanged');
+  Stream<FrameworkEvent> get onColPercentWidthChanged => ListRenderer.onColPercentWidthChangedEvent.forTarget(this);
   double _colPercentWidth = .0;
 
   double get colPercentWidth => _colPercentWidth;
@@ -155,6 +167,8 @@ class ListRenderer extends ListWrapper {
   // rowHeight
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onRowHeightChangedEvent = const EventHook<FrameworkEvent>('rowHeightChanged');
+  Stream<FrameworkEvent> get onRowHeightChanged => ListRenderer.onRowHeightChangedEvent.forTarget(this);
   int _rowHeight = 0;
 
   int get rowHeight => _rowHeight;
@@ -176,6 +190,8 @@ class ListRenderer extends ListWrapper {
   // rowPercentHeight
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onRowPercentHeightChangedEvent = const EventHook<FrameworkEvent>('rowPercentHeightChanged');
+  Stream<FrameworkEvent> get onRowPercentHeightChanged => ListRenderer.onRowPercentHeightChangedEvent.forTarget(this);
   double _rowPercentHeight = .0;
 
   double get rowPercentHeight => _rowPercentHeight;
@@ -197,6 +213,8 @@ class ListRenderer extends ListWrapper {
   // scrollPosition
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onScrollPositionChangedEvent = const EventHook<FrameworkEvent>('scrollPositionChanged');
+  Stream<FrameworkEvent> get onScrollPositionChanged => ListRenderer.onScrollPositionChangedEvent.forTarget(this);
   int _scrollPosition = 0;
 
   int get scrollPosition => _scrollPosition;
@@ -329,7 +347,7 @@ class ListRenderer extends ListWrapper {
 
   void _removeAllElements() {
     if (_itemRenderers != null) {
-      _itemRenderers.removeAll(_itemRenderers);
+      _itemRenderers.removeRange(0, _itemRenderers.length);
     }
 
     removeAll();
@@ -351,6 +369,9 @@ class ListRenderer extends ListWrapper {
     }
   }
 
+  static const EventHook<FrameworkEvent> onRendererAddedEvent = const EventHook<FrameworkEvent>('rendererAdded');
+  Stream<FrameworkEvent> get onRendererAdded => ListRenderer.onRendererAddedEvent.forTarget(this);
+  
   void _createElement(Object item, int index) {
     if (_itemRenderers == null) {
       _itemRenderers = new List<IItemRenderer>();
@@ -364,7 +385,7 @@ class ListRenderer extends ListWrapper {
 
     _itemRenderers.add(renderer);
 
-    renderer['controlChanged'] = _itemRenderer_controlChangedHandler;
+    renderer.onControlChanged.listen(_itemRenderer_controlChangedHandler);
 
     add(renderer);
 
@@ -621,13 +642,6 @@ class ListRenderer extends ListWrapper {
     
     if (pos != _scrollPosition) {
       scrollPosition = pos;
-      
-      notify(
-          new FrameworkEvent(
-              'scrollChanged',
-              relatedObject: _control
-          )
-      );
     }
   }
 

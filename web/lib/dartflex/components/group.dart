@@ -20,6 +20,8 @@ class Group extends UIWrapper {
   // horizontalScrollPolicy
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onHorizontalScrollPolicyChangedEvent = const EventHook<FrameworkEvent>('horizontalScrollPolicyChanged');
+  Stream<FrameworkEvent> get onHorizontalScrollPolicyChanged => Group.onHorizontalScrollPolicyChangedEvent.forTarget(this);
   String _horizontalScrollPolicy = ScrollPolicy.NONE;
 
   String get horizontalScrollPolicy => _horizontalScrollPolicy;
@@ -43,6 +45,8 @@ class Group extends UIWrapper {
   // verticalScrollPolicy
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onVerticalScrollPolicyChangedEvent = const EventHook<FrameworkEvent>('verticalScrollPolicyChanged');
+  Stream<FrameworkEvent> get onVerticalScrollPolicyChanged => Group.onVerticalScrollPolicyChangedEvent.forTarget(this);
   String _verticalScrollPolicy = ScrollPolicy.NONE;
 
   String get verticalScrollPolicy => _verticalScrollPolicy;
