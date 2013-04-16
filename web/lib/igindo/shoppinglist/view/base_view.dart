@@ -1,6 +1,9 @@
 part of shoppinglist;
 
-class BaseView extends VGroup {
+class BaseView extends VGroup implements IViewStackElement {
+  
+  static const EventHook<ViewStackEvent> onRequestViewChangeEvent = const EventHook<ViewStackEvent>(ViewStackEvent.REQUEST_VIEW_CHANGE);
+  Stream<ViewStackEvent> get onRequestViewChange => BaseView.onRequestViewChangeEvent.forTarget(this);
   
   //---------------------------------
   //
@@ -11,6 +14,9 @@ class BaseView extends VGroup {
   //---------------------------------
   // listName
   //---------------------------------
+  
+  static const EventHook<FrameworkEvent> onListNameChangedEvent = const EventHook<FrameworkEvent>('listNameChanged');
+  Stream<FrameworkEvent> get onListNameChanged => BaseView.onListNameChangedEvent.forTarget(this);
   
   String _listName;
   bool _isListNameInvalid = false;
@@ -86,7 +92,7 @@ class BaseView extends VGroup {
   //---------------------------------
 
   BaseView() : super(elementId: null, gap: 0) {
-    this['initializationComplete'] = _initializationCompleteHandler;
+    onInitializationComplete.listen(_initializationCompleteHandler);
   }
   
   void _init() {
@@ -116,7 +122,9 @@ class BaseView extends VGroup {
     _header.leftSideItems + _homeButton;
     _header.rightSideItems + _settingsButton;
     
-    _homeButton['click'] = (FrameworkEvent event) => _requestView(sequentialView: ViewStackEvent.REQUEST_PREVIOUS_VIEW);
+    _homeButton.onClick.listen(
+        (FrameworkEvent event) => _requestView(sequentialView: ViewStackEvent.REQUEST_PREVIOUS_VIEW)
+    );
     
     add(_header);
   }
@@ -133,8 +141,7 @@ class BaseView extends VGroup {
     ..height = 40
     ..label = 'E';
     
-    _toggleRowSizeButton.observe(
-        'click', 
+    _toggleRowSizeButton.onClick.listen(
         (FrameworkEvent event) => _grid.rowHeight = (_grid.rowHeight == 60) ? 200 : 60
     );
     

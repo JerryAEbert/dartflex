@@ -1,5 +1,17 @@
 part of dartflex;
 
+abstract class IViewStackElement implements IUIWrapper {
+  
+  //---------------------------------
+  //
+  // Events
+  //
+  //---------------------------------
+  
+  Stream<FrameworkEvent> get onRequestViewChange;
+
+}
+
 class ViewStack extends UIWrapper {
 
   //---------------------------------
@@ -69,7 +81,7 @@ class ViewStack extends UIWrapper {
     throw new ArgumentError('Please use addView() instead');
   }
   
-  void addView(String uniqueId, IUIWrapper element) {
+  void addView(String uniqueId, IViewStackElement element) {
     ViewStackElement viewStackElement;
     int i = _registeredViews.length;
     
@@ -86,10 +98,7 @@ class ViewStack extends UIWrapper {
     viewStackElement.element = element;
     viewStackElement.uniqueId = uniqueId;
     
-    element.observe(
-        ViewStackEvent.REQUEST_VIEW_CHANGE, 
-        _viewStackElement_requestViewChangeHandler
-    );
+    element.onRequestViewChange.listen(_viewStackElement_requestViewChangeHandler);
     
     _registeredViews.add(viewStackElement);
   }

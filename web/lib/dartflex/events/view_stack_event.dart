@@ -40,10 +40,10 @@ class ViewStackEvent extends FrameworkEvent {
     return new ViewStackEvent.construct('ViewStackEvent', type, relatedObject: relatedObject, namedView: namedView, sequentialView: sequentialView);
   }
 
-  static String REQUEST_VIEW_CHANGE = 'requestViewChange';
+  static const String REQUEST_VIEW_CHANGE = 'requestViewChange';
   
-  static int REQUEST_PREVIOUS_VIEW = 1;
-  static int REQUEST_NEXT_VIEW = 2;
-  static int REQUEST_FIRST_VIEW = 3;
-  static int REQUEST_LAST_VIEW = 4;
+  static const int REQUEST_PREVIOUS_VIEW = 1;
+  static const int REQUEST_NEXT_VIEW = 2;
+  static const int REQUEST_FIRST_VIEW = 3;
+  static const int REQUEST_LAST_VIEW = 4;
 }
