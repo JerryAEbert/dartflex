@@ -41,6 +41,18 @@ class ListRenderer extends ListWrapper {
       }
     }
   }
+  
+  //---------------------------------
+  // labelFunction
+  //---------------------------------
+
+  set labelFunction(Function value) {
+    if (value != labelFunction) {
+      super.labelFunction = value;
+      
+      later > _updateVisibleItemRenderers;
+    }
+  }
 
   //---------------------------------
   // orientation
@@ -377,7 +389,7 @@ class ListRenderer extends ListWrapper {
       _itemRenderers = new List<IItemRenderer>();
     }
 
-    final IItemRenderer renderer = _itemRendererFactory.immediateInstance()
+    final IItemRenderer renderer = (_itemRendererFactory.immediateInstance() as IItemRenderer)
       ..index = index
       ..autoDrawBackground = _useSelectionEffects;
 

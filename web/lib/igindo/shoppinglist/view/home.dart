@@ -20,7 +20,9 @@ class HomeView extends BaseView {
     ..height = 60
     ..label = 'open list';
     
-    button['click'] = (FrameworkEvent event) => _requestView(sequentialView: ViewStackEvent.REQUEST_PREVIOUS_VIEW);
+    button.onClick.listen(
+        (FrameworkEvent event) => _requestView(sequentialView: ViewStackEvent.REQUEST_PREVIOUS_VIEW)
+    );
     
     group.add(button);
     

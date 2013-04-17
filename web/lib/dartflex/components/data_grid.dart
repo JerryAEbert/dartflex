@@ -299,7 +299,7 @@ class DataGrid extends ListWrapper {
       for (i=0; i<len; i++) {
         column = _columns[i] as DataGridColumn;
 
-        header = column.headerItemRendererFactory.immediateInstance()
+        header = (column.headerItemRendererFactory.immediateInstance() as IItemRenderer)
           ..height = _headerHeight
           ..data =  column.headerData
           ..['click'] = _header_clickHandler;

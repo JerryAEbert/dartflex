@@ -142,16 +142,6 @@ html,body {
 }
 
 ._ViewStackSlider {
-  transition: left .75s ease-out;
-  -moz-transition: left .75s ease-out;
-  -webkit-transition: left .75s ease-out;
-  -o-transition: left .75s ease-out;
-  -ms-transition: left .75s ease-out;
-  transitionDelay: .6s;
-  -moz-transitionDelay: .6s;
-  -webkit-transitionDelay: .6s;
-  -o-transitionDelay: .6s;
-  -ms-transitionDelay: .6s;
 }
 
 ._DataGrid {

@@ -14,6 +14,8 @@ class ListWrapper extends Group {
   // dataProvider
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onDataProviderChangedEvent = const EventHook<FrameworkEvent>('dataProviderChanged');
+  Stream<FrameworkEvent> get onDataProviderChanged => ListWrapper.onDataProviderChangedEvent.forTarget(this);
   ListCollection _dataProvider;
 
   ListCollection get dataProvider => _dataProvider;
@@ -32,6 +34,13 @@ class ListWrapper extends Group {
       if (value != null) {
         value.onCollectionChanged.listen(_dataProvider_collectionChangedHandler);
       }
+      
+      notify(
+          new FrameworkEvent(
+            'dataProviderChanged',
+            relatedObject: value
+          )
+      );
 
       invalidateProperties();
     }
@@ -41,11 +50,21 @@ class ListWrapper extends Group {
   // labelFunction
   //---------------------------------
 
+  static const EventHook<FrameworkEvent> onLabelFunctionChangedEvent = const EventHook<FrameworkEvent>('labelFunctionChanged');
+  Stream<FrameworkEvent> get onLabelFunctionChanged => ListWrapper.onLabelFunctionChangedEvent.forTarget(this);
   Function _labelFunction;
 
   Function get labelFunction => _labelFunction;
   set labelFunction(Function value) {
-    _labelFunction = value;
+    if (value != _labelFunction) {
+      _labelFunction = value;
+      
+      notify(
+          new FrameworkEvent(
+            'labelFunctionChanged'
+          )
+      );
+    }
   }
 
   //---------------------------------

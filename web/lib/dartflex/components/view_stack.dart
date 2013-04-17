@@ -40,9 +40,9 @@ class ViewStack extends UIWrapper {
   // registeredViews
   //---------------------------------
   
-  List<ViewStackElement> _registeredViews = new List<ViewStackElement>();
+  List<ViewStackElementData> _registeredViews = new List<ViewStackElementData>();
   
-  List<ViewStackElement> get registeredViews => _registeredViews;
+  List<ViewStackElementData> get registeredViews => _registeredViews;
   
   //---------------------------------
   // activeView
@@ -54,10 +54,10 @@ class ViewStack extends UIWrapper {
   // activeViewStackElement
   //---------------------------------
   
-  ViewStackElement _activeViewStackElement;
-  ViewStackElement _inactiveViewStackElement;
+  ViewStackElementData _activeViewStackElement;
+  ViewStackElementData _inactiveViewStackElement;
   
-  ViewStackElement get activeViewStackElement => _activeViewStackElement;
+  ViewStackElementData get activeViewStackElement => _activeViewStackElement;
 
   //---------------------------------
   //
@@ -82,7 +82,7 @@ class ViewStack extends UIWrapper {
   }
   
   void addView(String uniqueId, IViewStackElement element) {
-    ViewStackElement viewStackElement;
+    ViewStackElementData viewStackElement;
     int i = _registeredViews.length;
     
     while (i > 0) {
@@ -93,7 +93,7 @@ class ViewStack extends UIWrapper {
       }
     }
     
-    viewStackElement = new ViewStackElement();
+    viewStackElement = new ViewStackElementData();
     
     viewStackElement.element = element;
     viewStackElement.uniqueId = uniqueId;
@@ -103,13 +103,16 @@ class ViewStack extends UIWrapper {
     _registeredViews.add(viewStackElement);
   }
   
+  int _xOffset = 0;
+  int _xOffsetSwitch = 0;
+  
   bool show(String uniqueId) {
     if (_container == null) {
       onControlChanged.listen(
           (FrameworkEvent event) => show(uniqueId)
       );
     } else {
-      ViewStackElement viewStackElement;
+      ViewStackElementData viewStackElement;
       final int currentIndex = (_activeViewStackElement != null) ? _registeredViews.indexOf(_activeViewStackElement) : -1;
       int newIndex = -1;
       int i = _registeredViews.length;
@@ -138,17 +141,20 @@ class ViewStack extends UIWrapper {
         _inactiveViewStackElement = _activeViewStackElement;
         
         if (newIndex > currentIndex) {
-          _container.x -= _width;
+          --_xOffset;
           
-          viewStackElement.element.x = _inactiveViewStackElement.element.x + _width;
+          _xOffsetSwitch = 1;
         } else {
-          _container.x += _width;
+          ++_xOffset;
           
-          viewStackElement.element.x = _inactiveViewStackElement.element.x - _width;
+          _xOffsetSwitch = -1;
         }
       }
       
       _activeViewStackElement = viewStackElement;
+      
+      _reflowManager.invalidateCSS(_container.control, 'transition', 'left .75s ease-out');
+      _reflowManager.invalidateCSS(_container.control, 'transitionDelay', '.6s');
       
       _container.add(viewStackElement.element);
       
@@ -194,17 +200,14 @@ class ViewStack extends UIWrapper {
   void _updateLayout() {
     super._updateLayout();
     
-    if (_graphics != null) {
-      _graphics.width = _width;
-      _graphics.height = _height;
-    }
-    
     if (_container != null) {
+      _container.x = _xOffset * _width;
       _container.width = 2 * _width;
       _container.height = _height;
     }
 
     if (_activeViewStackElement != null) {
+      _activeViewStackElement.element.x = _xOffset * -_width;
       _activeViewStackElement.element.width = _width;
       _activeViewStackElement.element.height = _height;
     }
@@ -216,7 +219,7 @@ class ViewStack extends UIWrapper {
     } else if (event.sequentialView > 0) {
       final int len = _registeredViews.length;
       final int index = _registeredViews.indexOf(_activeViewStackElement);
-      ViewStackElement requestedElement;
+      ViewStackElementData requestedElement;
       int requestedIndex;
       
       if (event.sequentialView == ViewStackEvent.REQUEST_PREVIOUS_VIEW) {
@@ -239,14 +242,21 @@ class ViewStack extends UIWrapper {
   
   void _container_transitionEndHandler(Event event) {
     if (_inactiveViewStackElement != null) {
-      _inactiveViewStackElement.element.visible = false;
-      
-      _inactiveViewStackElement = null;
+      _reflowManager.scheduleMethod(this, _container_hideInactiveView, [], forceSingleExecution: true);
     }
+    
+    _reflowManager.invalidateCSS(_container.control, 'transition', 'left 0s ease-out');
+    _reflowManager.invalidateCSS(_container.control, 'transitionDelay', '0s');
+  }
+  
+  void _container_hideInactiveView() {
+    _inactiveViewStackElement.element.visible = false;
+    
+    _inactiveViewStackElement = null;
   }
 }
 
-class ViewStackElement {
+class ViewStackElementData {
   
   IUIWrapper element;
   String uniqueId;
