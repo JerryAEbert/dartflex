@@ -5,6 +5,7 @@ import 'dart:core';
 import 'dart:html';
 import 'dart:math';
 import 'dart:mirrors';
+import 'package:web_ui/web_ui.dart';
 
 part "collections/list_collection.dart";
 
@@ -22,7 +23,7 @@ part "components/hgroup.dart";
 part "components/image.dart";
 part "components/item_renderer.dart";
 part "components/list_renderer.dart";
-part "components/list_wrapper.dart";
+part "components/list_base.dart";
 part "components/rich_text.dart";
 part "components/sprite_sheet.dart";
 part "components/tile_group.dart";

@@ -53,7 +53,7 @@ class HeaderItemRenderer extends ItemRenderer {
         )
     );
 
-    add(_button);
+    addComponent(_button);
   }
 
   void invalidateData() {
@@ -109,7 +109,7 @@ class IdItemRenderer extends ItemRenderer {
     ..paddingLeft = 5
     ..text = (data != null) ? data['id'].toString() : '';
 
-    add(_label);
+    addComponent(_label);
   }
 
   void invalidateData() {
@@ -172,7 +172,7 @@ class ProductItemRenderer extends ItemRenderer {
         }
     );
 
-    add(_label);
+    addComponent(_label);
   }
 
   void invalidateData() {
@@ -231,8 +231,8 @@ class ManagerItemRenderer extends ItemRenderer {
     ..paddingLeft = 5
     ..text = (data != null) ? data['manager'] : '';
 
-    add(_icon);
-    add(_label);
+    addComponent(_icon);
+    addComponent(_label);
   }
 
   void invalidateData() {
@@ -302,7 +302,7 @@ class TagItemRenderer extends ItemRenderer {
     ..dataProvider = dataProvider
     ..selectedItem = data['tag'];
 
-    add(_dropdown);
+    addComponent(_dropdown);
   }
   
   void invalidateData() {
@@ -354,7 +354,7 @@ class PhoneItemRenderer extends ItemRenderer {
     ..paddingLeft = 3
     ..text = (data != null) ? data['phone'] : '';
 
-    add(_label);
+    addComponent(_label);
   }
   
   void invalidateData() {
@@ -411,7 +411,7 @@ class ImageItemRenderer extends ItemRenderer {
       _image.source = 'http://www.igindo.com/orgchart/assets/rndImg/$imageNumber.jpg';
     }
 
-    add(_image);
+    addComponent(_image);
   }
 
   void invalidateData() {
@@ -470,7 +470,7 @@ class RatingItemRenderer extends ItemRenderer {
     ..rowSize = 14
     ..source = 'http://www.igindo.com/dart/m/rating.png';
 
-    add(_spriteSheet);
+    addComponent(_spriteSheet);
   }
 
   void invalidateData() {
@@ -532,7 +532,7 @@ class ToggleItemRenderer extends ItemRenderer {
         }    
     );
 
-    add(_toggle);
+    addComponent(_toggle);
   }
 
   void invalidateData() {

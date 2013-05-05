@@ -1,6 +1,6 @@
 part of dartflex;
 
-class DataGrid extends ListWrapper {
+class DataGrid extends ListBase {
 
   //---------------------------------
   //
@@ -219,10 +219,10 @@ class DataGrid extends ListWrapper {
     ..itemRendererFactory = new ClassFactory(constructorMethod: DataGridItemRenderer.construct)
     ..useSelectionEffects = _useSelectionEffects;
 
-    _gridContainer.add(_headerContainer);
-    _gridContainer.add(_list);
+    _gridContainer.addComponent(_headerContainer);
+    _gridContainer.addComponent(_list);
 
-    add(_gridContainer);
+    addComponent(_gridContainer);
 
     _setControl(container);
 
@@ -310,7 +310,7 @@ class DataGrid extends ListWrapper {
           header.percentWidth = column.percentWidth;
         }
 
-        _headerContainer.add(header);
+        _headerContainer.addComponent(header);
       }
 
       if (

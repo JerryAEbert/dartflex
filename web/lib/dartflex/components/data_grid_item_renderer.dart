@@ -126,7 +126,7 @@ class DataGridItemRenderer extends ItemRenderer {
 
         _itemRendererInstances.add(renderer);
 
-        add(renderer);
+        addComponent(renderer);
       }
     }
   }

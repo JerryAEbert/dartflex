@@ -113,7 +113,7 @@ abstract class IUIWrapper implements IFrameworkEventDispatcher {
 
 }
 
-class UIWrapper implements IUIWrapper {
+class UIWrapper extends Object with WebComponent implements IUIWrapper {
 
   //---------------------------------
   //
@@ -154,7 +154,7 @@ class UIWrapper implements IUIWrapper {
       ..width = _width
       ..height = _height;
 
-      add(_graphics, prepend: true);
+      addComponent(_graphics, prepend: true);
     }
 
     return _graphics;
@@ -687,7 +687,7 @@ class UIWrapper implements IUIWrapper {
     }
   }
 
-  void add(IUIWrapper element, {bool prepend: false}) {
+  void addComponent(IUIWrapper element, {bool prepend: false}) {
     if (_children.indexOf(element) >= 0) {
       return;
     }
@@ -759,7 +759,7 @@ class UIWrapper implements IUIWrapper {
     _control.append(controlToAppend);
   }
 
-  void remove(IUIWrapper element) {
+  void removeComponent(IUIWrapper element) {
     if (
         (_control != null) &&
         _control.contains(element.control)
@@ -775,7 +775,7 @@ class UIWrapper implements IUIWrapper {
 
   void removeAll() {
     while (_children.length > 0) {
-      remove(_children.removeLast());
+      removeComponent(_children.removeLast());
     }
 
     if (_control != null) {
@@ -971,7 +971,7 @@ class UIWrapper implements IUIWrapper {
 
   void _addAllPendingElements() {
     _addLaterElements.forEach(
-        (element) => add(element)
+        (element) => addComponent(element)
     );
 
     _addLaterElements = new List<IUIWrapper>();

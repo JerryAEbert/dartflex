@@ -126,7 +126,7 @@ class BaseView extends VGroup implements IViewStackElement {
         (FrameworkEvent event) => _requestView(sequentialView: ViewStackEvent.REQUEST_PREVIOUS_VIEW)
     );
     
-    add(_header);
+    addComponent(_header);
   }
   
   void _initGrid() {}
@@ -145,9 +145,9 @@ class BaseView extends VGroup implements IViewStackElement {
         (FrameworkEvent event) => _grid.rowHeight = (_grid.rowHeight == 60) ? 200 : 60
     );
     
-    _footer.add(_toggleRowSizeButton);
+    _footer.addComponent(_toggleRowSizeButton);
     
-    add(_footer);
+    addComponent(_footer);
   }
   
   void invalidateProperties() {

@@ -77,7 +77,7 @@ class ViewStack extends UIWrapper {
   //
   //---------------------------------
   
-  void add(IUIWrapper element, {bool prepend: false}) {
+  void addComponent(IUIWrapper element, {bool prepend: false}) {
     throw new ArgumentError('Please use addView() instead');
   }
   
@@ -156,7 +156,7 @@ class ViewStack extends UIWrapper {
       _reflowManager.invalidateCSS(_container.control, 'transition', 'left .75s ease-out');
       _reflowManager.invalidateCSS(_container.control, 'transitionDelay', '.6s');
       
-      _container.add(viewStackElement.element);
+      _container.addComponent(viewStackElement.element);
       
       _updateLayout();
       
@@ -190,7 +190,7 @@ class ViewStack extends UIWrapper {
         'absolute'
     );
     
-    super.add(_container);
+    super.addComponent(_container);
     
     _container.control.onTransitionEnd.listen(_container_transitionEndHandler);
 

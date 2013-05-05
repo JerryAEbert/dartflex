@@ -166,9 +166,9 @@ class Header extends Group {
     _headerLabel.onWidthChanged.listen(_updateWidth);
     _headerLabel.onHeightChanged.listen(_updateHeight);
     
-    add(_leftSideContainer);
-    add(_rightSideContainer);
-    add(_headerLabel);
+    addComponent(_leftSideContainer);
+    addComponent(_rightSideContainer);
+    addComponent(_headerLabel);
 
     super._createChildren();
   }
@@ -270,7 +270,7 @@ class Header extends Group {
             (FrameworkEvent event) => invalidateProperties()
         );
         
-        group.add(child);
+        group.addComponent(child);
       }
     }
     

@@ -1,6 +1,6 @@
 part of dartflex;
 
-class ListRenderer extends ListWrapper {
+class ListRenderer extends ListBase {
 
   List<IItemRenderer> _itemRenderers;
 
@@ -350,7 +350,7 @@ class ListRenderer extends ListWrapper {
     _scrollTarget.autoSize = false;
     _scrollTarget.includeInLayout = false;
 
-    add(_scrollTarget);
+    addComponent(_scrollTarget);
 
     _setControl(container);
 
@@ -364,7 +364,7 @@ class ListRenderer extends ListWrapper {
 
     removeAll();
 
-    add(_scrollTarget);
+    addComponent(_scrollTarget);
   }
 
   void _updateRenderer(IItemRenderer renderer) {
@@ -399,7 +399,7 @@ class ListRenderer extends ListWrapper {
 
     renderer.onControlChanged.listen(_itemRenderer_controlChangedHandler);
 
-    add(renderer);
+    addComponent(renderer);
 
     notify(
         new FrameworkEvent(
@@ -464,8 +464,8 @@ class ListRenderer extends ListWrapper {
     return (_dataProvider.length * _getPageItemSize());
   }
 
-  void remove(IUIWrapper element) {
-    super.remove(element);
+  void removeComponent(IUIWrapper element) {
+    super.removeComponent(element);
 
     if (_itemRenderers != null) {
       _itemRenderers.remove(element);
@@ -502,7 +502,7 @@ class ListRenderer extends ListWrapper {
       int i;
 
       for (i=len; i<0; i++) {
-        remove(_itemRenderers.removeLast());
+        removeComponent(_itemRenderers.removeLast());
       }
 
       for (i=0; i<len; i++) {

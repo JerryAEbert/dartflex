@@ -1,6 +1,6 @@
 part of dartflex;
 
-class ComboBox extends ListWrapper {
+class ComboBox extends ListBase {
 
   //---------------------------------
   //

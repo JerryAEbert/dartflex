@@ -24,9 +24,9 @@ class HomeView extends BaseView {
         (FrameworkEvent event) => _requestView(sequentialView: ViewStackEvent.REQUEST_PREVIOUS_VIEW)
     );
     
-    group.add(button);
+    group.addComponent(button);
     
-    add(group);
+    addComponent(group);
   }
 }
 

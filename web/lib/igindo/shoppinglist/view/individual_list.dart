@@ -43,7 +43,7 @@ class IndividualList extends BaseView {
                  ]
     );
     
-    add(_grid);
+    addComponent(_grid);
   }
   
   String getRandomProduct() {
